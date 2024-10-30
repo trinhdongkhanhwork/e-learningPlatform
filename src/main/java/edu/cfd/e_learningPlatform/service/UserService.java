@@ -1,0 +1,24 @@
+package edu.cfd.e_learningPlatform.service;
+
+import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
+import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
+import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
+import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+
+import java.util.List;
+
+public interface UserService {
+    UserResponse createUser(UserCreationRequest request);
+
+    UserResponse getMyInfo();
+
+    List<UserResponse> getUsers();
+
+    UserResponse getUser(String id);
+
+    UserResponse updateUser(String userId, UserUpdateRequest request);
+
+    void deleteUser(String userId);
+
+    void updatePassWord(String email, UpdatePassWordRequest request, boolean vail);
+}
