@@ -43,7 +43,6 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
-
     @PostMapping("/send-email-creation-user")
     ApiResponse<EmailResponse> creationUser(@RequestBody EmailRequest request) throws MessagingException {
         String otp = emailService.generateOTP(request.getEmail());
@@ -51,7 +50,25 @@ public class AuthenticationController {
         return ApiResponse.<EmailResponse>builder()
                 .result(EmailResponse.builder()
                         .hashedOtp( passwordEncoder.encode(otp))
+    @PostMapping("/forgot-password")
+    ApiResponse<EmailResponse> forgotPassword(@RequestBody EmailRequest request) throws MessagingException {
+        String otp = emailService.generateOTP(request.getEmail());
+        emailService.sendOTPEmail(request.getEmail(), otp);
+        return ApiResponse.<EmailResponse>builder()
+                .result(EmailResponse.builder()
+                        .hashedOtp(passwordEncoder.encode(otp))
                         .creationTime(LocalDateTime.now())
+                        .build())
+                .build();
+    }
+
+    @PostMapping("/verify-otp")
+    public ApiResponse<VerifyOtpResponse> verifyOtp(@RequestBody VerifyOtpRequest request) {
+        LocalDateTime expirationTime = LocalDateTime.now();
+        boolean isOtpValid = emailService.verifyOTP(request.getOtp(), request.getHashedOtp(), request.getCreationTime(), expirationTime);
+        return ApiResponse.<VerifyOtpResponse>builder()
+                .result(VerifyOtpResponse.builder()
+                        .valid(isOtpValid)
                         .build())
                 .build();
     }
