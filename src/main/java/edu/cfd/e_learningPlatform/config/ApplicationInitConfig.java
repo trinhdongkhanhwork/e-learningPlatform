@@ -58,8 +58,8 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
-                        .email("user@example.com")
-                        .fullname("John Doe")
+                        .email("khanhtdps36301@fpt.edu.vn")
+                        .fullname("khanhtd36301")
                         .birthday(new Date())
                         .gender(Gender.MALE)
                         .phone("123456789")
@@ -69,8 +69,6 @@ public class ApplicationInitConfig {
                         .updatedDate(LocalDateTime.now())
                         .isActive(true)
                         .build();
-
-
                 userRepository.save(user);
                 log.warn("Admin user has been created with default password: admin, please change it.");
             }
