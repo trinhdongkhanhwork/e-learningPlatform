@@ -34,4 +34,46 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping
+    ApiResponse<List<UserResponse>> getUsers() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username: {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
+    }
+
+    @GetMapping("/myInfo")
+    ApiResponse<UserResponse> getMyInfo() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
+
+    @DeleteMapping("/{userId}")
+    ApiResponse<String> deleteUser(@PathVariable String userId) {
+        userService.deleteUser(userId);
+        return ApiResponse.<String>builder()
+                .result("User has been deleted")
+                .build();
+    }
+
+    @PutMapping("/{userId}")
+    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUser(userId, request))
+                .build();
+    }
+
+    @PutMapping("/updatePassWord/{email}/{vail}")
+    ApiResponse<UpdatePassWordResponse> updatePassWord(@PathVariable String email, @PathVariable boolean vail, @RequestBody UpdatePassWordRequest request) {
+        userService.updatePassWord(email, request, vail);
+        return ApiResponse.<UpdatePassWordResponse>builder()
+                .result(UpdatePassWordResponse.builder()
+                        .response(vail)
+                        .build())
+                .build();
+    }
 }
