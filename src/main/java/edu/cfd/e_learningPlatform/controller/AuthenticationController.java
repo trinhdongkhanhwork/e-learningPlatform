@@ -43,7 +43,13 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
-
+    @PostMapping("/send-email-creation-user")
+    ApiResponse<EmailResponse> creationUser(@RequestBody EmailRequest request) throws MessagingException {
+        String otp = emailService.generateOTP(request.getEmail());
+        emailService.sendOTPEmailForCreationUser(request.getEmail(),request.getUsername(), otp);
+        return ApiResponse.<EmailResponse>builder()
+                .result(EmailResponse.builder()
+                        .hashedOtp( passwordEncoder.encode(otp))
     @PostMapping("/forgot-password")
     ApiResponse<EmailResponse> forgotPassword(@RequestBody EmailRequest request) throws MessagingException {
         String otp = emailService.generateOTP(request.getEmail());
@@ -66,6 +72,5 @@ public class AuthenticationController {
                         .build())
                 .build();
     }
-
 
 }
