@@ -3,7 +3,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import edu.cfd.e_learningPlatform.dto.QuizDto;
 
 import edu.cfd.e_learningPlatform.mapstruct.QuizMapper;
-import edu.cfd.e_learningPlatform.repository.QuizReponsitory;
+import edu.cfd.e_learningPlatform.repository.QuizRepository;
 import edu.cfd.e_learningPlatform.service.QuizService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class QuizServiceImpl implements QuizService {
-    QuizReponsitory quizReponsitory;
+    QuizRepository quizReponsitory;
     QuizMapper quizMapper;
     @Override
     public QuizDto findByLectureId(Long lectureId) {

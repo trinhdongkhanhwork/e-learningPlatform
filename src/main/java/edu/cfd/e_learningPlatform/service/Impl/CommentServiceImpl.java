@@ -42,7 +42,7 @@ public class CommentServiceImpl implements CommentService {
                         (String) result[2],           //idUserComment
                         (String) result[3],       // profilePicture
                         (String) result[4],    // commentText
-                        (String) result[5],       // nameUserReply
+                        (String) result[5],       // nameUserParent
                         (Long) result[6]         // parentId
                 )).collect(Collectors.toList());
         return commentVideoResponses;
