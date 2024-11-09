@@ -1,9 +1,13 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.VideoDto;
+import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
+import edu.cfd.e_learningPlatform.dto.response.VideoInlectureResponse;
 import edu.cfd.e_learningPlatform.entity.Video;
 import edu.cfd.e_learningPlatform.mapstruct.VideoMapper;
+import edu.cfd.e_learningPlatform.repository.CommentReponsitory;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
+import edu.cfd.e_learningPlatform.service.CommentService;
 import edu.cfd.e_learningPlatform.service.VideoService;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +18,15 @@ import java.util.stream.Collectors;
 public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
+    private final CommentService commentService;
     private final VideoMapper videoMapper = VideoMapper.INSTANCE;
+    private final CommentReponsitory commentReponsitory;
 
-    public VideoServiceImpl(VideoRepository videoRepository) {
+    public VideoServiceImpl(VideoRepository videoRepository, CommentService commentService, CommentReponsitory commentReponsitory) {
         this.videoRepository = videoRepository;
+        this.commentService = commentService;
+        this.commentReponsitory = commentReponsitory;
     }
-
 
     @Override
     public List<VideoDto> getAllVideos() {
@@ -55,5 +62,23 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void deleteVideo(Long id) {
         videoRepository.deleteById(id);
+    }
+
+    @Override
+    public VideoInlectureResponse getVideoLecture(Long lectureId) {
+        Video video = videoRepository.findByLecture_Id(lectureId);
+        if (video == null) {
+            return null;
+        } else  {
+            List<CommentVideoResponse> commentVideoResponse = commentService.getCommentVideo(video.getId());
+            if(commentVideoResponse.size() == 0) {
+                commentVideoResponse = null;
+            }
+            return new VideoInlectureResponse(
+                    video.getId(),
+                    video.getVideoUrl(),
+                    commentVideoResponse
+            );
+        }
     }
 }

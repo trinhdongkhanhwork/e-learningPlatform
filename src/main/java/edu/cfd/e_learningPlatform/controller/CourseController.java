@@ -21,7 +21,6 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     @PostMapping
     public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseCreationRequest courseCreationRequest) {
@@ -38,5 +37,10 @@ public class CourseController {
     public ResponseEntity<Map<String, String>> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
         return ResponseEntity.ok(Map.of("message", "Course "+id+" deleted successfully"));
+    }
+
+    @GetMapping("/course/{id}")
+    public ResponseEntity<CourseResponse> getCourse(@PathVariable Long id){
+        return ResponseEntity.ok(courseService.getCourseById(id));
     }
 }
