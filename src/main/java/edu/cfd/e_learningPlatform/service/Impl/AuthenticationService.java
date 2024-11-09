@@ -1,18 +1,24 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.request.AuthenticationRequest;
+import edu.cfd.e_learningPlatform.dto.request.ExchangeTokenRequest;
 import edu.cfd.e_learningPlatform.dto.request.IntrospectRequest;
 import edu.cfd.e_learningPlatform.dto.response.AuthenticationResponse;
 import edu.cfd.e_learningPlatform.dto.response.IntrospectResponse;
+import edu.cfd.e_learningPlatform.entity.Role;
 import edu.cfd.e_learningPlatform.entity.User;
+import edu.cfd.e_learningPlatform.enums.Gender;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
+import edu.cfd.e_learningPlatform.repository.RoleRepository;
+import edu.cfd.e_learningPlatform.repository.httpClient.OutboundIdentityClient;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import edu.cfd.e_learningPlatform.repository.httpClient.OutboundUserClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -35,10 +42,28 @@ import java.util.StringJoiner;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
     UserRepository userRepository;
+    OutboundIdentityClient outboundIdentityClient;
+    OutboundUserClient outboundUserClient;
+    RoleRepository roleRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
+
+    @NonFinal
+    @Value("${outbound.client-id}")
+    protected String CLIENT_ID;
+
+    @NonFinal
+    @Value("${outbound.client-secret}")
+    protected String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${outbound.redirect-uri}")
+    protected String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
 
     public IntrospectResponse introspect(IntrospectRequest request)
             throws JOSEException, ParseException {
@@ -54,6 +79,42 @@ public class AuthenticationService {
 
         return IntrospectResponse.builder()
                 .valid(verified && expiryTime.after(new Date()))
+                .build();
+    }
+
+    public AuthenticationResponse outboundAuthenticate(String code) {
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        log.info("TOKEN RESPONSE {}", response);
+
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        log.info("USER INFO {}", userInfo);
+
+        LocalDateTime now = LocalDateTime.now();
+        Role defaultRole = roleRepository.findByRoleName("STUDENT")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+
+        var user = userRepository.findByEmail(userInfo.getEmail()).orElseGet(() -> userRepository.save(User.builder()
+                .username(userInfo.getId())
+                .gender(Gender.PRIVATE)
+                .password("")
+                .email(userInfo.getEmail())
+                .fullname(userInfo.getName())
+                .avatarUrl(userInfo.getPicture())
+                .createdDate(now)
+                .isActive(false)
+                .roleEntity(defaultRole)
+                .build()));
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
                 .build();
     }
 
