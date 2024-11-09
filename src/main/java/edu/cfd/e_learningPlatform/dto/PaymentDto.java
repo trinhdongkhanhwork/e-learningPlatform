@@ -18,4 +18,5 @@ public class PaymentDto {
     private Long courseId;
     private Long paymentStatusId;
     private Boolean  enrollment;
+
 }
