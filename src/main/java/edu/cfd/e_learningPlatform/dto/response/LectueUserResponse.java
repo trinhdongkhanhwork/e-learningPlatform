@@ -21,5 +21,8 @@ public class LectueUserResponse {
     private QuizDto quiz;
     private AssignmentDto assignment;
     private List<Long> optionChose;
+    private boolean doneVideo;
+    private boolean doneAssignment;
+    private boolean doneQuiz;
     private boolean status;
 }
