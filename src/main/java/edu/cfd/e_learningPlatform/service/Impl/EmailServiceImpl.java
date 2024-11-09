@@ -57,7 +57,7 @@ public class EmailServiceImpl implements EmailService {
     public boolean verifyOTP(String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime) {
         return encryptedOtp != null
                 && passwordEncoder.matches(request, encryptedOtp)
-                && Duration.between(creationTime, expirationTime).getSeconds() <= 30;
+                && Duration.between(creationTime, expirationTime).getSeconds() <= 120;
 
     }
 

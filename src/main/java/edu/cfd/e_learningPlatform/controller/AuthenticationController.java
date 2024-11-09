@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,6 +27,14 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     EmailService emailService;
     PasswordEncoder passwordEncoder;
+
+    @PostMapping("/outbound/authentication")
+    ApiResponse<AuthenticationResponse> outboundAuthenticate(
+            @RequestParam("code") String code
+    ) {
+        var result = authenticationService.outboundAuthenticate(code);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    }
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
@@ -40,7 +49,7 @@ public class AuthenticationController {
             throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
-                .result(result)
+                .result( result)
                 .build();
     }
 
