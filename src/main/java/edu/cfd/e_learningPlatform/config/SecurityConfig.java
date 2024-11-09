@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {"/users",
             "/authentication/token", "/authentication/introspect",
-            "/courses", "/api/v1/courses/**", "/lectures", "/lectures/**", "/api/s3/upload"
+            "/courses", "/api/v1/courses/**", "/lectures", "/lectures/**", "/api/s3/upload", "/comments/**"
     };
 
     @Value("${jwt.signerKey}")
@@ -90,6 +90,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("PUT");
         configuration.addAllowedMethod("DELETE");
         configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

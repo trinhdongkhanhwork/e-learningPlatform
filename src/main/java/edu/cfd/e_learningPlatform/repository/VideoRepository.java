@@ -10,4 +10,6 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
 
     @Query("SELECT v FROM Video v WHERE v.fileName = ?1")
     Video findByFileName(String fileName);
+
+    Video findByLecture_Id(long id);
 }
