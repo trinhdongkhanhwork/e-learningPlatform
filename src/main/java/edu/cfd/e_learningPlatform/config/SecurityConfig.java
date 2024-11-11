@@ -56,8 +56,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-
-
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
