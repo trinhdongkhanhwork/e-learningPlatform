@@ -6,7 +6,7 @@ import edu.cfd.e_learningPlatform.entity.Comment;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.entity.Video;
 import edu.cfd.e_learningPlatform.mapstruct.CommentMapper;
-import edu.cfd.e_learningPlatform.repository.CommentReponsitory;
+import edu.cfd.e_learningPlatform.repository.CommentRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
 import edu.cfd.e_learningPlatform.service.CommentService;
@@ -24,14 +24,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    CommentReponsitory commentReponsitory;
+    CommentRepository commentRepository;
     CommentMapper commentMapper;
     VideoRepository videoReponsitory;
     private final UserRepository userRepository;
 
     @Override
     public List<CommentVideoResponse> getCommentVideo(Long idVideo) {
-        List<Object[]> resutls = commentReponsitory.getCommentVideo(idVideo);
+        List<Object[]> resutls = commentRepository.getCommentVideo(idVideo);
         if(resutls == null){
             return null;
         }
@@ -59,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         if(commentRequest.getParentId() != null){
-            Comment commentParent = commentReponsitory.findById(commentRequest.getParentId()).orElse(null);
+            Comment commentParent = commentRepository.findById(commentRequest.getParentId()).orElse(null);
             comment.setComment(commentParent);
         } else {
             comment.setComment(null);
@@ -75,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setStar(commentRequest.getStar());
-        commentReponsitory.save(comment);
+        commentRepository.save(comment);
         return commentMapper.commentToCommentVideoResponse(comment);
     }
 
@@ -90,7 +90,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         if(commentRequest.getParentId() != null){
-            Comment commentParent = commentReponsitory.findById(commentRequest.getParentId()).orElse(null);
+            Comment commentParent = commentRepository.findById(commentRequest.getParentId()).orElse(null);
             comment.setComment(commentParent);
         } else {
             comment.setComment(null);
@@ -106,14 +106,24 @@ public class CommentServiceImpl implements CommentService {
         comment.setCommentText(commentRequest.getCommentText());
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setStar(commentRequest.getStar());
-        commentReponsitory.save(comment);
+        commentRepository.save(comment);
         return commentMapper.commentToCommentVideoResponse(comment);
     }
 
     @Override
     public Long deleteComment(Long idComment) {
-        if(commentReponsitory.existsById(idComment)) {
-            commentReponsitory.deleteById(idComment);
+        if(commentRepository.existsById(idComment)) {
+            Comment commentIndex = commentRepository.findById(idComment).orElse(null);
+
+            while (commentIndex != null) {
+                List<Comment> commentChilds = commentRepository.findByReplyId(commentIndex.getId()); // Lấy ra comment con
+                if (commentChilds.size() <= 0) { //Nếu không có comment con thì xóa
+                    commentRepository.delete(commentIndex);
+                    commentIndex = commentRepository.findById(idComment).orElse(null);
+                } else { // Nếu có comment con thì chuyển comment con tiếp theo làm cha và tiếp tục vòng lặp
+                    commentIndex = commentChilds.get(0);
+                }
+            }
             return idComment;
         } else {
             throw new RuntimeException("Not found comment");

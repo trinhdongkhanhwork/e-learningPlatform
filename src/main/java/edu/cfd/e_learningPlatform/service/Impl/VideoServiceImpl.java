@@ -5,7 +5,7 @@ import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
 import edu.cfd.e_learningPlatform.dto.response.VideoInlectureResponse;
 import edu.cfd.e_learningPlatform.entity.Video;
 import edu.cfd.e_learningPlatform.mapstruct.VideoMapper;
-import edu.cfd.e_learningPlatform.repository.CommentReponsitory;
+import edu.cfd.e_learningPlatform.repository.CommentRepository;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
 import edu.cfd.e_learningPlatform.service.CommentService;
 import edu.cfd.e_learningPlatform.service.VideoService;
@@ -20,12 +20,12 @@ public class VideoServiceImpl implements VideoService {
     private final VideoRepository videoRepository;
     private final CommentService commentService;
     private final VideoMapper videoMapper = VideoMapper.INSTANCE;
-    private final CommentReponsitory commentReponsitory;
+    private final CommentRepository commentRepository;
 
-    public VideoServiceImpl(VideoRepository videoRepository, CommentService commentService, CommentReponsitory commentReponsitory) {
+    public VideoServiceImpl(VideoRepository videoRepository, CommentService commentService, CommentRepository commentRepository) {
         this.videoRepository = videoRepository;
         this.commentService = commentService;
-        this.commentReponsitory = commentReponsitory;
+        this.commentRepository = commentRepository;
     }
 
     @Override
