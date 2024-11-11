@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CommentReponsitory extends JpaRepository<Comment, Long>{
+public interface CommentRepository extends JpaRepository<Comment, Long>{
     @Query(value = "select " +
             "c.id as id, " +
             "u.fullname as fullName, " +
@@ -21,4 +21,9 @@ public interface CommentReponsitory extends JpaRepository<Comment, Long>{
             "left join users userCommentParent on commentParent.user_id = userCommentParent.id " +
             "where c.video_id = :id", nativeQuery = true)
     List<Object[]> getCommentVideo(Long id);
+
+    @Query("SELECT c from Comment c where c.comment.id = :id")
+    List<Comment> findByReplyId(Long id);
+
+
 }

@@ -42,14 +42,4 @@ public class CommentController {
         commentService.deleteComment(commentVideoResponse.getId());
         return commentVideoResponse.getId();
     }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<List<CommentVideoResponse>> getCommentInVideo(@PathVariable Long id) {
-        return ResponseEntity.ok(commentService.getCommentVideo(id));
-    }
-
-    @GetMapping("/video/{idLecture}")
-    public ResponseEntity<VideoInlectureResponse> getVideoInlecture(@PathVariable Long idLecture) {
-        return ResponseEntity.ok(videoService.getVideoLecture(idLecture));
-    }
 }
