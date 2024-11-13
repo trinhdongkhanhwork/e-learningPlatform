@@ -13,6 +13,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,8 +28,8 @@ public class EmailServiceImpl implements EmailService {
 
     JavaMailSender mailSender;
     UserRepository userRepository;
-
     PasswordEncoder passwordEncoder;
+    SpringTemplateEngine templateEngine;
 
     @Override
     public String generateOTP(String email) {
@@ -83,5 +85,29 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmailDeleteCourse(Long id) {
 
     }
+    @Override
+    public void sendEmailPayment(String to, String subject, String paymentId, Double price, String paymentDate) throws MessagingException {
+        // Tạo context để gửi thông tin vào template
+        Context context = new Context();
+        context.setVariable("subject", subject);
+        context.setVariable("paymentId", paymentId);
+        context.setVariable("price", price);
+        context.setVariable("paymentDate", paymentDate);
+        context.setVariable("showPaymentDetails", true); // Bật hiển thị chi tiết thanh toán
+        context.setVariable("title", "Payment Confirmation");
+        context.setVariable("message", "Thank you for your payment! Your transaction was successful.");
 
+        // Render template với thông tin
+        String body = templateEngine.process("email-template", context);  // payment-email-template là tên của file template
+
+        // Tạo email
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(body, true);  // true để gửi email dạng HTML
+
+        // Gửi email
+        mailSender.send(message);
+    }
 }
