@@ -17,7 +17,7 @@ public class CourseCreationRequest {
     private String title;
     private String description;
     private LocalDateTime createdAt;
-    private String category;
+    private Long categoryId;
     private String coverImage;
     private BigDecimal price;
     private boolean published;

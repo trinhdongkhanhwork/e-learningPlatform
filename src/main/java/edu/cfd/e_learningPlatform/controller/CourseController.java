@@ -28,7 +28,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseResponse>> getAllCourses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<CourseResponse>> getAllCourses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size) {
         return ResponseEntity.ok(courseService.getAllCourses(page, size));
     }
 
@@ -39,8 +39,10 @@ public class CourseController {
         return ResponseEntity.ok(Map.of("message", "Course "+id+" deleted successfully"));
     }
 
-    @GetMapping("/course/{id}")
+    @GetMapping("/getCourseById/{id}")
     public ResponseEntity<CourseResponse> getCourse(@PathVariable Long id){
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
+
+
 }

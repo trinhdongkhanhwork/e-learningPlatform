@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import edu.cfd.e_learningPlatform.entity.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,7 +26,11 @@ public class Course {
     private String title;
 
     private String description;
-    private String category;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(name = "cover_image", columnDefinition = "TEXT")
     private String coverImage;
     private BigDecimal price = BigDecimal.ZERO;

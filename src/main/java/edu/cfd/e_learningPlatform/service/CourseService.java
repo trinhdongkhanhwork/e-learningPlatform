@@ -10,4 +10,5 @@ public interface CourseService {
     CourseResponse createCourse(CourseCreationRequest courseCreationRequest);
     CourseResponse updateCourse(Long id, CourseCreationRequest courseCreationRequest);
     void deleteCourse(Long id);
+
 }
