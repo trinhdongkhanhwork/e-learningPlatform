@@ -22,7 +22,6 @@ import java.util.List;
 public class CommentController {
 
     CommentService commentService;
-    VideoService videoService;
 
     @MessageMapping("/comments/post")
     @SendTo("/topic/comments")
