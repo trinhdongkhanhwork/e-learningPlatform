@@ -10,4 +10,7 @@ public interface EmailService {
     boolean verifyOTP(String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime);
     void sendOTPEmailForCreationUser(String email,String username, String otp) throws MessagingException;
 
+    void sendEmail(String to, String subject, String htmlContent) throws MessagingException;
+
+    void sendEmailDeleteCourse(Long id);
 }

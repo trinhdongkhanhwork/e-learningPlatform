@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
         user.setRoleEntity(defaultRole);
         user.setCreatedDate(now);
-        user.setActive(false);
+        user.setIsActive(String.valueOf(false));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         if (!vail) {
             return;
         }
-        User user = userRepository.findByEmail(email)
+        User user = (User) userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);

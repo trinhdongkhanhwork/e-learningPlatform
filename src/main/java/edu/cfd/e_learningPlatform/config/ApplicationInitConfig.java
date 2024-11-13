@@ -67,7 +67,7 @@ public class ApplicationInitConfig {
                         .avatarUrl("http://example.com/avatar.jpg")
                         .createdDate(LocalDateTime.now())
                         .updatedDate(LocalDateTime.now())
-                        .isActive(true)
+                        .isActive(String.valueOf(true))
                         .build();
                 userRepository.save(user);
                 log.warn("Admin user has been created with default password: admin, please change it.");

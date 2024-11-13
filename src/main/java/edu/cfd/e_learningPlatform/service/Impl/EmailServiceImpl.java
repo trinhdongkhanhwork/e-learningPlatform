@@ -68,4 +68,20 @@ public class EmailServiceImpl implements EmailService {
         helper.setText("Your OTP code is: " + otp, true);
         mailSender.send(message);
     }
+    @Override
+    public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true); // true để chỉ định là nội dung HTML
+
+        mailSender.send(mimeMessage);
+    }
+
+    @Override
+    public void sendEmailDeleteCourse(Long id) {
+
+    }
+
 }
