@@ -15,7 +15,7 @@ import lombok.Setter;
 public class LectureUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -27,7 +27,6 @@ public class LectureUser {
 
     private String choseOption;
     private String urlFileAssigment;
-
     private boolean doneQuiz;
     private boolean doneVideo;
     private boolean doneAssigment;
