@@ -1,49 +1,39 @@
 package edu.cfd.e_learningPlatform.utils;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.TemplateEngine;
+import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 @Component
 public class PdfGenerator {
 
-    // Phương thức nhận đối tượng CourseDto và tạo file PDF
-    public static byte[] generateCoursePdf(CourseResponse course) throws IOException {
-        // Tạo tài liệu PDF mới
-        Document document = new Document();
+    @Autowired
+    private TemplateEngine templateEngine;
+
+    public byte[] generateCoursePdf(CourseResponse course) throws IOException {
+        // Tạo đối tượng Thymeleaf Context
+        Context context = new Context();
+        // Truyền các biến vào Thymeleaf template
+        context.setVariable("title", course.getTitle());
+        context.setVariable("description", course.getDescription());
+        context.setVariable("category", course.getCategory());
+        context.setVariable("coverImage", course.getCoverImage());
+        context.setVariable("price", course.getPrice());
+        context.setVariable("level", course.getLevel());
+        context.setVariable("instructor", course.getInstructor().getFullname());
+        // Render HTML từ Thymeleaf template
+        String htmlContent = templateEngine.process("course-template", context);
+        // Tạo PDF từ HTML
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(htmlContent);
+        renderer.layout();
+        renderer.createPDF(byteArrayOutputStream);
 
-        try {
-            // Khởi tạo PdfWriter để ghi tài liệu vào ByteArrayOutputStream
-            PdfWriter.getInstance(document, byteArrayOutputStream);
-            document.open();
-
-            // Thêm thông tin khóa học vào tài liệu PDF
-            document.add(new Paragraph("Course Title: " + course.getTitle()));
-            document.add(new Paragraph("Description: " + course.getDescription()));
-            document.add(new Paragraph("Created At: " + course.getCreatedAt()));
-            document.add(new Paragraph("Category: " + course.getCategory()));
-            document.add(new Paragraph("Price: " + course.getPrice()));
-            document.add(new Paragraph("Level: " + course.getLevel()));
-            document.add(new Paragraph("Instructor: " + course.getInstructor().getFullname()));
-
-            // Bạn có thể tiếp tục thêm thông tin bổ sung nếu cần (ví dụ: Sections, Cover Image, v.v.)
-
-        } catch (DocumentException e) {
-            // Nếu có lỗi trong quá trình tạo PDF, ném ra IOException
-            throw new IOException("Error while generating PDF", e);
-        } finally {
-            // Đảm bảo đóng tài liệu PDF sau khi thêm thông tin
-            document.close();
-        }
-
-        // Trả về file PDF dưới dạng byte array
         return byteArrayOutputStream.toByteArray();
     }
 }
