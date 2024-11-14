@@ -1,6 +1,6 @@
 package edu.cfd.e_learningPlatform.entity;
 
-import edu.cfd.e_learningPlatform.entity.Role;
+
 import edu.cfd.e_learningPlatform.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;

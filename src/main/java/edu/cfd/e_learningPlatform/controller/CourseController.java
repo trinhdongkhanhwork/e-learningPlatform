@@ -28,7 +28,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseResponse>> getAllCourses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<CourseResponse>> getAllCourses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size) {
         return ResponseEntity.ok(courseService.getAllCourses(page, size));
     }
 
@@ -43,4 +43,6 @@ public class CourseController {
     public ResponseEntity<CourseResponse> getCourse(@PathVariable Long id){
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
+
+
 }

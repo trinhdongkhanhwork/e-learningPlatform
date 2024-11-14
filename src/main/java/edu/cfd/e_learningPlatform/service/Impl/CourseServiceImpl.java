@@ -4,7 +4,9 @@ import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
 import edu.cfd.e_learningPlatform.entity.*;
 import edu.cfd.e_learningPlatform.mapstruct.CourseMapper;
+import edu.cfd.e_learningPlatform.repository.CategoryRepository;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
+import edu.cfd.e_learningPlatform.repository.PaymentRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.CourseService;
 import edu.cfd.e_learningPlatform.service.EmailService;
@@ -13,6 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -20,12 +26,16 @@ public class CourseServiceImpl implements CourseService {
     private final CourseMapper courseMapper;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final PaymentRepository paymentRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper, UserRepository userRepository, EmailService emailService) {
+    public CourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper, UserRepository userRepository, EmailService emailService, PaymentRepository paymentRepository, CategoryRepository categoryRepository) {
         this.courseRepository = courseRepository;
         this.courseMapper = courseMapper;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.paymentRepository = paymentRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -75,13 +85,47 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<CourseResponse> getAllCourses(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return courseRepository.findAll(pageable).map(courseMapper::toCourseResponse);
+
+        // Lấy tất cả các khóa học trong trang
+        Page<Course> coursePage = courseRepository.findAll(pageable);
+
+        // Lấy danh sách tất cả các danh mục trong cơ sở dữ liệu
+        List<Category> categories = categoryRepository.findAll();
+
+        // Tính số lượng khóa học thuộc từng danh mục
+        Map<Long, Long> categoryCourseCount = coursePage.getContent().stream()
+                .collect(Collectors.groupingBy(course -> course.getCategory().getId(), Collectors.counting()));
+
+        // Ánh xạ các khóa học sang CourseResponse và tính toán số lượng người đã đăng ký
+        Page<CourseResponse> courseResponses = coursePage.map(course -> {
+            CourseResponse courseResponse = courseMapper.toCourseResponse(course);
+
+            // Lấy số lượng người đã đăng ký
+            long enrolledCount = paymentRepository.countByCourseIdAndEnrollmentTrue(course.getId());
+            courseResponse.setEnrolledUserCount(enrolledCount);
+
+            // Thêm số lượng khóa học thuộc danh mục vào thông tin của mỗi khóa học
+            long courseCountInCategory = categoryCourseCount.getOrDefault(course.getCategory().getId(), 0L);
+            courseResponse.setCategoryCourseCount(courseCountInCategory);
+
+            return courseResponse;
+        });
+
+        return courseResponses;
     }
+
 
     @Override
     public CourseResponse getCourseById(Long id) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
-        return courseMapper.toCourseResponse(course);
+
+        // Tính số lượng người đã ghi danh vào khóa học
+        long enrolledCount = paymentRepository.countByCourseIdAndEnrollmentTrue(course.getId());
+
+        CourseResponse courseResponse = courseMapper.toCourseResponse(course);
+        courseResponse.setEnrolledUserCount(enrolledCount);
+
+        return courseResponse;
     }
 
     @Override
@@ -97,4 +141,6 @@ public class CourseServiceImpl implements CourseService {
         emailService.sendEmailDeleteCourse(id);
         courseRepository.deleteById(id);
     }
+
+
 }
