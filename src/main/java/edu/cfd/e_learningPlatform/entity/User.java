@@ -63,8 +63,7 @@ public class User {
     int version;
 
     @Column(name = "is_active")
-    @Builder.Default
-    private boolean isActive = false;
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

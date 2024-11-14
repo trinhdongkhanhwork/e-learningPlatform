@@ -14,9 +14,15 @@ public interface UserService {
 
     List<UserResponse> getUsers();
 
+    List<UserResponse> getUsersUpdateTeacher();
+
     UserResponse getUser(String id);
 
     UserResponse updateUser(String userId, UserUpdateRequest request);
+
+    void updateTeacher(String userId);
+
+    void updateRoles(String userId);
 
     void deleteUser(String userId);
 
