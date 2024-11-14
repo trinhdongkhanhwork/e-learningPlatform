@@ -2,8 +2,9 @@ package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.request.*;
 import edu.cfd.e_learningPlatform.dto.response.*;
+import edu.cfd.e_learningPlatform.service.AuthenticationService;
 import edu.cfd.e_learningPlatform.service.EmailService;
-import edu.cfd.e_learningPlatform.service.Impl.AuthenticationService;
+import edu.cfd.e_learningPlatform.service.Impl.AuthenticationServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,7 +49,7 @@ public class AuthenticationController {
             throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
-                .result( result)
+                .result(result)
                 .build();
     }
 

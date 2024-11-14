@@ -77,6 +77,25 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @Override
+    public void updateRoles(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role defaultRole = roleRepository.findByRoleName("INSTRUCTOR")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+
+        user.setRoleEntity(defaultRole);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateTeacher(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
 
     @Override
     public void deleteUser(String userId) {
@@ -88,6 +107,14 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getUsers() {
         log.info("Get all users");
         return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse).toList();
+    }
+
+    @Override
+    public List<UserResponse> getUsersUpdateTeacher() {
+        return userRepository.findAll().stream()
+                .filter(user -> !user.isActive())
+                .filter(user -> "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()))
                 .map(userMapper::toUserResponse).toList();
     }
 
