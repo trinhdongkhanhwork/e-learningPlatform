@@ -15,8 +15,10 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     ROLE_NOT_FOUND(1009, "Role not found", HttpStatus.NOT_FOUND),
-    INVALID_REQUEST(1010,"Request is not null", HttpStatus.BAD_REQUEST)
-    ;
+    INVALID_REQUEST(1010,"Request is not null", HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND(1011,"User not found", HttpStatus.NOT_FOUND),
+    COURSE_NOT_FOUND(1012,"Course not found", HttpStatus.NOT_FOUND),
+    WISHLIST_NOT_FOUND(1013,"Wishlist not found", HttpStatus.NOT_FOUND);
 
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

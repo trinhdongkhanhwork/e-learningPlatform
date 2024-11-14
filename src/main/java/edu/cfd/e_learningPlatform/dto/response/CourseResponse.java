@@ -18,11 +18,13 @@ public class CourseResponse {
     private String title;
     private String description;
     private LocalDateTime createdAt;
-    private String category;
+    private Long categoryId;
     private String coverImage;
     private BigDecimal price;
     private boolean published;
     private String level;
     private UserResponse instructor;
     private List<SectionDto> sections = new ArrayList<>();
+    private long enrolledUserCount;
+    private long categoryCourseCount;
 }

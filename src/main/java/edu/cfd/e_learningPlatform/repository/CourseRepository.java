@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
+    @Query("SELECT c FROM Course c WHERE c.title = ?1")
+    Course findByCourseName(String courseName);
+
+    long countByCategoryId(Long categoryId);
 }

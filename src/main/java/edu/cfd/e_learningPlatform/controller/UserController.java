@@ -45,6 +45,13 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/getListUsersUpdateTeacher")
+    ApiResponse<List<UserResponse>> getUsersUpdateTeacher() {
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsersUpdateTeacher())
+                .build();
+    }
+
     @GetMapping("/myInfo")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
@@ -74,6 +81,22 @@ public class UserController {
                 .result(UpdatePassWordResponse.builder()
                         .response(vail)
                         .build())
+                .build();
+    }
+
+    @PutMapping("/updateTeacher/{userId}")
+    public ApiResponse<String> updateTeacher(@PathVariable String userId) {
+        userService.updateTeacher(userId);
+        return ApiResponse.<String>builder()
+                .result("User role updated and activated")
+                .build();
+    }
+
+    @PutMapping("/updateRoles/{userId}")
+    public ApiResponse<String> updateRoles(@PathVariable String userId) {
+        userService.updateRoles(userId);
+        return ApiResponse.<String>builder()
+                .result("User role updated to INSTRUCTOR")
                 .build();
     }
 }

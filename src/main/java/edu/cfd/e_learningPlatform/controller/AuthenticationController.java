@@ -2,8 +2,9 @@ package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.request.*;
 import edu.cfd.e_learningPlatform.dto.response.*;
+import edu.cfd.e_learningPlatform.service.AuthenticationService;
 import edu.cfd.e_learningPlatform.service.EmailService;
-import edu.cfd.e_learningPlatform.service.Impl.AuthenticationService;
+import edu.cfd.e_learningPlatform.service.Impl.AuthenticationServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
@@ -26,6 +27,14 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     EmailService emailService;
     PasswordEncoder passwordEncoder;
+
+    @PostMapping("/outbound/authentication")
+    ApiResponse<AuthenticationResponse> outboundAuthenticate(
+            @RequestParam("code") String code
+    ) {
+        var result = authenticationService.outboundAuthenticate(code);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    }
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {

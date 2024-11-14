@@ -25,12 +25,14 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    private BigDecimal price = BigDecimal.ZERO;
+
+    private BigDecimal price;
 
     private LocalDateTime paymentDate= LocalDateTime.now();
 
     @Column(name = "enrollment", columnDefinition = "bit")
     private Boolean enrollment;
+
     private String paymentId;
 
     @ManyToOne

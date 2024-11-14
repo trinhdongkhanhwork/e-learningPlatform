@@ -1,9 +1,7 @@
 package edu.cfd.e_learningPlatform.service;
 
-
 import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 
 public interface CourseService {
@@ -12,4 +10,5 @@ public interface CourseService {
     CourseResponse createCourse(CourseCreationRequest courseCreationRequest);
     CourseResponse updateCourse(Long id, CourseCreationRequest courseCreationRequest);
     void deleteCourse(Long id);
+
 }

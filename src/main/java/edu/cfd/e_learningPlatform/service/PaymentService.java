@@ -1,10 +1,5 @@
 package edu.cfd.e_learningPlatform.service;
 
-
-import edu.cfd.e_learningPlatform.dto.response.PaymentResponse;
-
-import java.util.List;
-
 public interface PaymentService {
-    List<PaymentResponse> getAllPayments();
+    boolean IsPaymentCourse(Long idCourse, String userId);
 }
