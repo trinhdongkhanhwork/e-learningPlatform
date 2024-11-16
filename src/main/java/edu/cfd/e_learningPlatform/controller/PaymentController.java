@@ -1,5 +1,6 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import edu.cfd.e_learningPlatform.dto.response.PaymentResponse;
 import edu.cfd.e_learningPlatform.service.PaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -20,5 +23,9 @@ public class PaymentController {
     @GetMapping("/isPayment/{idCourse}/{userId}")
     public ResponseEntity<Boolean> isPayment(@PathVariable Long idCourse,@PathVariable String userId){
         return ResponseEntity.ok(paymentService.IsPaymentCourse(idCourse,userId));
+    } ///lỗi ở đây
+    @GetMapping
+    public List<PaymentResponse> getAllPayments() {
+        return paymentService.getAllPayments();
     }
 }

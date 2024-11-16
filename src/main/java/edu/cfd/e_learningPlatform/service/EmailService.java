@@ -12,4 +12,6 @@ public interface EmailService {
     void sendOTPEmailForCreationUser(String email,String username, String otp) throws MessagingException;
     void sendEmailApprovedCourse(ApprovedCourseRequest approvedCourseRequest) throws MessagingException;
     void sendEmailDeleteCourse(Long id);
+
+    void sendEmail(String to, String subject, String htmlContent) throws MessagingException;
 }

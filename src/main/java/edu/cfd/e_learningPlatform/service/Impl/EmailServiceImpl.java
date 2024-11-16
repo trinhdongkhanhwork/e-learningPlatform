@@ -109,4 +109,14 @@ public class EmailServiceImpl implements EmailService {
         message.setText("Your course: " + course.getTitle() + " has been deleted");
         mailSender.send(message);
     }
+    @Override
+    public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true); // true để chỉ định là nội dung HTML
+
+        mailSender.send(mimeMessage);
+    }
 }

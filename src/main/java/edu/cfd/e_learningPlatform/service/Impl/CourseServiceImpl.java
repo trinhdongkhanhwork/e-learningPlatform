@@ -43,6 +43,8 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseMapper.toCourse(courseCreationRequest);
         course.setInstructor(userRepository.findById(courseCreationRequest.getInstructor())
                 .orElseThrow(() -> new RuntimeException("Instructor not found"))); // Thiết lập quan hệ giữa Course và User
+        course.setCategory(categoryRepository.findById(courseCreationRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"))); // Thiết lập quan hệ giữa Course và Category
         // Thiết lập quan hệ trước khi lưu
         if (course.getSections() != null) {
             for (Section section : course.getSections()) {
