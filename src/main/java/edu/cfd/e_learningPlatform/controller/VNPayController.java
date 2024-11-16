@@ -30,16 +30,17 @@ public class VNPayController {
                            @RequestParam(value = "vnp_TxnRef") String transactionNo,
                            @RequestParam(value = "courseId") Long courseId) throws MessagingException {
 
-        // Xử lý thanh toán thành công
-        vnPayService.successPay(request, transactionNo); // Gọi service để xử lý thanh toán
+        // Xử lý logic thanh toán thành công
+        vnPayService.successPay(request, transactionNo);
 
         try {
-            // Tạo URL chuyển hướng đến trang xác nhận ghi danh
+            // Tạo URL để chuyển hướng tới trang xác nhận đăng ký
             String redirectUrl = String.format("http://localhost:8081/vue/enrollment-confirmation?courseId=%d&paymentId=%s",
                     courseId, transactionNo);
-            response.sendRedirect(redirectUrl); // Chuyển hướng đến trang xác nhận
+            // Chuyển hướng tới URL
+            response.sendRedirect(redirectUrl);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Ghi log nếu xảy ra lỗi trong quá trình chuyển hướng
         }
     }
     @GetMapping("/cancel")
@@ -47,3 +48,4 @@ public class VNPayController {
         return ResponseEntity.ok(vnPayService.cancelPay());
     }
 }
+

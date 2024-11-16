@@ -8,14 +8,13 @@ import com.paypal.api.payments.PayoutSenderBatchHeader;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import edu.cfd.e_learningPlatform.dto.WithdrawDto;
+import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.Payment;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.entity.Withdraw;
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import edu.cfd.e_learningPlatform.mapstruct.WithdrawMapper;
-import edu.cfd.e_learningPlatform.repository.PaymentRepository;
-import edu.cfd.e_learningPlatform.repository.UserRepository;
-import edu.cfd.e_learningPlatform.repository.WithdrawRepository;
+import edu.cfd.e_learningPlatform.repository.*;
 import edu.cfd.e_learningPlatform.service.EmailService;
 import edu.cfd.e_learningPlatform.service.WithdrawService;
 import jakarta.mail.MessagingException;
@@ -44,6 +43,8 @@ public class WithdrawServiceImpl implements WithdrawService {
     EmailService emailService;
     WithdrawMapper withdrawMapper;
     WithdrawRepository withdrawRepository;
+    CourseRepository courseRepository;
+    PaymentStatusRepository paymentStatusRepository;
     private static final int OTP_LENGTH = 6; // Độ dài OTP
     private static final SecureRandom random = new SecureRandom();
 
@@ -124,38 +125,40 @@ public class WithdrawServiceImpl implements WithdrawService {
         return payout.create(apiContext, new HashMap<>());
     }
 
-
     @Override
-    public BigDecimal calculateTotalPayments(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
+    public BigDecimal calculateTotalPaymentsForInstructor(String userId) {
+        List<Course> courses = courseRepository.findByInstructorId(userId); // Lấy tất cả khóa học của giảng viên
+        BigDecimal totalPayments = BigDecimal.ZERO;
 
-        // Tính tổng số tiền từ bảng Payment với điều kiện paymentStatus id là 1
-        BigDecimal totalPayments = paymentRepository.findByUserAndPaymentStatus_Id(user, 1L)
-                .stream()
-                .map(Payment::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Tính tổng số tiền đã rút từ bảng Withdraw
-        BigDecimal totalWithdrawn = withdrawRepository.findByUser(user)
-                .stream()
-                .filter(withdraw -> withdraw.getStatus() == WithdrawStatus.COMPLETED) // Chỉ tính các yêu cầu đã hoàn tất
-                .map(Withdraw::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Tính số dư sau khi trừ đi số tiền đã rút
-        BigDecimal availableBalance = totalPayments.subtract(totalWithdrawn);
-
-        // Đảm bảo số dư không âm
-        if (availableBalance.compareTo(BigDecimal.ZERO) < 0) {
-            availableBalance = BigDecimal.ZERO;
+        // Tính tổng số tiền từ các thanh toán liên quan đến khóa học của giảng viên
+        for (Course course : courses) {
+            BigDecimal courseTotal = paymentRepository.sumPriceByCourseId(course.getId());
+            // Nếu courseTotal là null, gán giá trị là BigDecimal.ZERO
+            if (courseTotal == null) {
+                courseTotal = BigDecimal.ZERO;
+            }
+            totalPayments = totalPayments.add(courseTotal);
         }
 
-        // Lưu số dư còn lại cho người dùng
-        user.setPrice(availableBalance);
-        userRepository.save(user);
+        // Tính tổng số tiền đã rút của giảng viên
+        BigDecimal totalWithdrawals = withdrawRepository.sumAmountByUserIdAndStatus(userId, WithdrawStatus.COMPLETED);
+        // Nếu totalWithdrawals là null, gán giá trị là BigDecimal.ZERO
+        if (totalWithdrawals == null) {
+            totalWithdrawals = BigDecimal.ZERO;
+        }
 
-        return availableBalance; // Trả về số dư hiện có
+        // Trừ số tiền đã rút ra khỏi tổng số tiền
+        BigDecimal netTotal = totalPayments.subtract(totalWithdrawals);
+
+        // Lưu tổng số tiền vào bảng User
+        Optional<User> userOptional = userRepository.findById(userId); // Tìm người dùng theo userId
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setPrice(netTotal); // Lưu tổng số tiền đã trừ vào thuộc tính price của User
+            userRepository.save(user); // Lưu lại vào cơ sở dữ liệu
+        }
+
+        return netTotal; // Trả về tổng số tiền đã trừ
     }
 
 
@@ -222,7 +225,7 @@ public class WithdrawServiceImpl implements WithdrawService {
                 .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedDelay = 60000) // Kiểm tra mỗi 1 phút
+    @Scheduled(fixedDelay = 60000)
     public void checkWithdrawRequestExpiry() {
         List<Withdraw> pendingWithdrawals = withdrawRepository.findByStatus(WithdrawStatus.PENDING);
 

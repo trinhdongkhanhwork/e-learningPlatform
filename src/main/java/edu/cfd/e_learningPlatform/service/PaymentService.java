@@ -9,5 +9,5 @@ import java.util.List;
 public interface PaymentService {
     boolean IsPaymentCourse(Long idCourse, String userId);
 
-    List<PaymentResponse> getAllPayments();
+    List<PaymentResponse> getPaymentHistoryByUserId(String userId);
 }

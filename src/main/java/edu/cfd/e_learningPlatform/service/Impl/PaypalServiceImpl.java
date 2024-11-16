@@ -8,6 +8,7 @@ import edu.cfd.e_learningPlatform.config.PaypalPaymentIntent;
 import edu.cfd.e_learningPlatform.config.PaypalPaymentMethod;
 import edu.cfd.e_learningPlatform.dto.PaymentDto;
 import edu.cfd.e_learningPlatform.entity.Course;
+import edu.cfd.e_learningPlatform.entity.PaymentStatus;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.mapstruct.PaymentMapper;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
@@ -28,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +56,7 @@ public class PaypalServiceImpl implements PaypalService {
                                  PaypalPaymentIntent intent, String description,
                                  String cancelUrl, String successUrl) throws PayPalRESTException {
         validatePaymentParameters(total, currency, method, intent);
-        currency = "USD";
+        currency = "USD"; // Dù bạn có thể sử dụng VND, nhưng PayPal yêu cầu USD ở đây.
         Amount amount = new Amount();
         amount.setCurrency(currency);
         amount.setTotal(BigDecimal.valueOf(total).setScale(2, RoundingMode.HALF_UP).toString());
@@ -79,7 +81,6 @@ public class PaypalServiceImpl implements PaypalService {
 
         return payment.create(apiContext);
     }
-
     @Override
     public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
         validateExecutionParameters(paymentId, payerId);
@@ -94,7 +95,6 @@ public class PaypalServiceImpl implements PaypalService {
 
     @Override
     public String processPayment(@RequestParam Double price, @RequestParam Long courseId, @RequestParam String userId) throws PayPalRESTException {
-
         validateProcessPaymentParameters(price, courseId, userId);
 
         // Lấy thông tin khóa học và người dùng
@@ -111,27 +111,74 @@ public class PaypalServiceImpl implements PaypalService {
             throw new IllegalArgumentException("Số tiền thanh toán không hợp lệ.");
         }
 
-        // Đường dẫn sau khi thanh toán thành công và hủy
-        String cancelUrl = "http://localhost:8081/api/payments/paypal/cancel";
-        String successUrl = buildSuccessUrl(courseId, userId, price);
+        // Kiểm tra xem người dùng đã thanh toán cho khóa học này chưa
+        List<edu.cfd.e_learningPlatform.entity.Payment> existingPayments = paymentRepository.findByUserIdAndCourseId(userId, courseId);
 
-        // Tạo Payment
-        Payment payment = createPayment(amount.doubleValue(), "VND", // Sử dụng VND thay vì USD
-                PaypalPaymentMethod.paypal, PaypalPaymentIntent.sale,
-                "Mô tả đơn hàng", cancelUrl, successUrl);
+        // Nếu chưa có thanh toán nào, tạo một thanh toán mới và lưu vào cơ sở dữ liệu
+        if (existingPayments.isEmpty()) {
+            String cancelUrl = "http://localhost:8081/api/payments/paypal/cancel";
+            String successUrl = buildSuccessUrl(courseId, userId, price);
 
-        // Tạo PaymentDto
-        PaymentDto paymentDto = createPaymentDto(payment, course, user, price);
+            // Tạo Payment qua PayPal
+            Payment payment = createPayment(amount.doubleValue(), "VND", PaypalPaymentMethod.paypal, PaypalPaymentIntent.sale,
+                    "Mô tả đơn hàng", cancelUrl, successUrl);
 
-        // Ánh xạ PaymentDto sang Payment entity
-        edu.cfd.e_learningPlatform.entity.Payment paymentEntity = PaymentMapper.INSTANCE.paymentDtoToPayment(paymentDto);
+            // Trả về PaymentApprovalLink từ PayPal
+            String approvalLink = findApprovalLink(payment)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy liên kết thanh toán."));
 
-        // Lưu Payment entity vào cơ sở dữ liệu
-        paymentRepository.save(paymentEntity);
+            // Lấy paymentId từ PayPal response
+            String paymentId = payment.getId();
 
-        // Trả về đường dẫn xác nhận thanh toán
-        return findApprovalLink(payment)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy liên kết thanh toán."));
+            // Tạo PaymentDto
+            PaymentDto paymentDto = createPaymentDto(payment, course, user, price);
+
+            // Ánh xạ PaymentDto sang Payment entity
+            edu.cfd.e_learningPlatform.entity.Payment paymentEntity = PaymentMapper.INSTANCE.paymentDtoToPayment(paymentDto);
+
+            // Lấy PaymentStatus từ cơ sở dữ liệu
+            PaymentStatus pendingStatus = paymentStatusRepository.findByStatusName("PENDING")
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy trạng thái thanh toán PENDING"));
+
+            // Gán PaymentStatus và paymentId vào Payment
+            paymentEntity.setPaymentStatus(pendingStatus);
+            paymentEntity.setPaymentId(paymentId); // Cập nhật paymentId từ PayPal
+
+            // Lưu Payment entity vào cơ sở dữ liệu
+            paymentRepository.save(paymentEntity);
+
+            // Trả về đường dẫn thanh toán PayPal
+            return approvalLink;
+        } else {
+            // Nếu đã có thanh toán, chỉ cần cập nhật lại dữ liệu vào thanh toán trước đó
+            edu.cfd.e_learningPlatform.entity.Payment existingPayment = existingPayments.get(0); // Lấy thanh toán đầu tiên
+
+            // Lấy PaymentStatus từ cơ sở dữ liệu
+            PaymentStatus pendingStatus = paymentStatusRepository.findByStatusName("PENDING")
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy trạng thái thanh toán PENDING"));
+
+            // Cập nhật các thông tin cần thiết cho thanh toán cũ
+            existingPayment.setPrice(BigDecimal.valueOf(price)); // Cập nhật giá trị thanh toán
+            existingPayment.setPaymentStatus(pendingStatus);  // Set đối tượng PaymentStatus thay vì long
+
+            // Cập nhật paymentId cho thanh toán cũ từ PayPal
+            Payment payment = createPayment(amount.doubleValue(), "VND", PaypalPaymentMethod.paypal, PaypalPaymentIntent.sale,
+                    "Mô tả đơn hàng", "http://localhost:8081/api/payments/paypal/cancel", buildSuccessUrl(courseId, userId, price));
+
+            // Lấy paymentId từ PayPal response
+            String paymentId = payment.getId();
+            existingPayment.setPaymentId(paymentId); // Cập nhật paymentId từ PayPal
+
+            // Lưu lại thanh toán đã cập nhật vào cơ sở dữ liệu
+            paymentRepository.save(existingPayment);
+
+            // Trả về đường dẫn thanh toán mới từ PayPal
+            String approvalLink = findApprovalLink(payment)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy liên kết thanh toán."));
+
+            // Trả về đường dẫn đến trang thanh toán PayPal mới
+            return approvalLink;
+        }
     }
 
     private void validatePaymentParameters(Double total, String currency, PaypalPaymentMethod method, PaypalPaymentIntent intent) {
@@ -241,5 +288,11 @@ public class PaypalServiceImpl implements PaypalService {
         for (edu.cfd.e_learningPlatform.entity.Payment payment : pendingPayments) {
             updatePaymentStatus(payment.getPaymentId(), 2L); // 2L là mã trạng thái "Failed"
         }
+    }
+    @Override
+    public boolean hasUserPaidForCourse(String userId, Long courseId) {
+        // Kiểm tra xem người dùng đã thanh toán cho khóa học này chưa
+        List<edu.cfd.e_learningPlatform.entity.Payment> payments = paymentRepository.findByUserIdAndCourseIdAndPaymentStatusId(userId, courseId, 1L); // Status 1L là Completed
+        return !payments.isEmpty();
     }
 }

@@ -12,9 +12,9 @@ public interface WithdrawService {
 
     WithdrawDto requestWithdraw(String userId, BigDecimal amount) throws MessagingException;
 
-    BigDecimal calculateTotalPayments(String userId);
-
     List<WithdrawDto> getWithdrawalHistory(String userId);
+
+    BigDecimal calculateTotalPaymentsForInstructor(String instructorId);
 
     void confirmWithdraw(Long withdrawId, String otp);
 }

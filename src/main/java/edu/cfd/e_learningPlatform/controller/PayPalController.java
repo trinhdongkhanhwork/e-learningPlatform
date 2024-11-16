@@ -20,12 +20,17 @@ public class PayPalController {
     private PaypalService paypalService;
     @Autowired
     private EmailService emailService;
-
     @PostMapping("/pay")
     public ResponseEntity<String> pay(@RequestParam("price") Double price,
                                       @RequestParam("courseId") Long courseId,
                                       @RequestParam("userId") String userId) {
         try {
+            // Kiểm tra xem người dùng đã thanh toán khóa học này chưa
+            boolean hasPaid = paypalService.hasUserPaidForCourse(userId, courseId);
+            if (hasPaid) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bạn đã thanh toán cho khóa học này.");
+            }
+
             String paymentUrl = paypalService.processPayment(price, courseId, userId);
             return ResponseEntity.ok("{\"paymentUrl\":\"" + paymentUrl + "\"}");
         } catch (PayPalRESTException e) {
@@ -34,6 +39,7 @@ public class PayPalController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @GetMapping("/success")
     public ResponseEntity<String> successPay(@RequestParam("paymentId") String paymentId,
