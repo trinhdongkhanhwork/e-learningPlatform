@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import edu.cfd.e_learningPlatform.config.VNPayConfig;
 import edu.cfd.e_learningPlatform.dto.PaymentDto;
 import edu.cfd.e_learningPlatform.entity.Payment;
+import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.mapstruct.PaymentMapper;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.repository.PaymentRepository;
@@ -36,9 +37,9 @@ public class VNPayServiceImpl implements VNPayService {
 
     PaymentRepository paymentRepository;
 
-    CourseRepository courseRepository;
-
-    PaymentStatusRepository paymentStatusRepository;
+//    CourseRepository courseRepository;
+//
+//    PaymentStatusRepository paymentStatusRepository;
 
     EmailService emailService;
     @Override
@@ -159,70 +160,90 @@ public class VNPayServiceImpl implements VNPayService {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
     }
-
+    @Override
     public Map<String, String> handlePayment(Long courseId, String userId, Integer price) {
         // Tạo URL thành công
         String successUrl = buildSuccessUrl(courseId, userId);
         String paymentUrl = createOrder(price, "Payment for course ID: " + courseId, successUrl);
 
-        // Tạo PaymentDTO và thực thể Payment
-        PaymentDto paymentDTO = createNewPaymentDTO(price, userId, courseId);
-        Payment newPayment = createNewPayment(paymentDTO);
-        newPayment.setPaymentId(transactionId); // Lấy transactionId từ createOrder
-        paymentRepository.save(newPayment);
-
+        // Không lưu thông tin thanh toán vào cơ sở dữ liệu tại đây
         Map<String, String> response = new HashMap<>();
         response.put("paymentUrl", paymentUrl);
         return response;
     }
 
-    private String buildSuccessUrl(Long courseId, String userId) {
-        return String.format("http://localhost:8080/api/payments/vnpay/success?courseId=%d&userId=%s", courseId, userId);
-    }
 
-    private PaymentDto createNewPaymentDTO(Integer price, String userId, Long courseId) {
-        PaymentDto paymentDto = new PaymentDto();
-        paymentDto.setPrice(BigDecimal.valueOf(price));
-        paymentDto.setPaymentDate(LocalDateTime.now());
-        paymentDto.setUserId(userId);
-        paymentDto.setCourseId(courseId);
-        paymentDto.setPaymentStatusId(3L); // ID 3cho trạng thái PENDING
-        paymentDto.setEnrollment(false); // sửa
-        return paymentDto;
-    }
-
-    private Payment createNewPayment(PaymentDto paymentDTO) {
-        return PaymentMapper.INSTANCE.paymentDtoToPayment(paymentDTO);
-    }
 
     @Override
     public void successPay(HttpServletRequest request, String transactionNo) throws MessagingException {
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
         String vnp_Amount = request.getParameter("vnp_Amount");
 
-        // Chuyển đổi từ VND sang USD
-        double amountInVND = Double.parseDouble(vnp_Amount); // Số tiền thanh toán bằng VND
-        double exchangeRate = 25000; // Tỷ giá VND -> USD (Ví dụ: 25,000 VND = 1 USD)
-        double amountInUSD = amountInVND / exchangeRate; // Quy đổi ra USD
+        String rawUserId = request.getParameter("userId");
+        String userId;
 
-        Payment existingPayment = (Payment) paymentRepository.findByPaymentId(transactionNo)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán cho transactionNo: " + transactionNo));
-
-        // Cập nhật trạng thái thanh toán
-        if ("00".equals(vnp_ResponseCode)) {
-            updatePaymentStatus(existingPayment, vnp_Amount, 1L); // ID 1 cho COMPLETED
+        // Loại bỏ phần không hợp lệ nếu có
+        if (rawUserId != null && rawUserId.contains("/")) {
+            userId = rawUserId.split("/")[0]; // Lấy phần trước dấu "/"
         } else {
-            updatePaymentStatus(existingPayment, vnp_Amount, 2L); // ID 2 cho FAILED
+            userId = rawUserId;
+        }
+        String courseIdParam = request.getParameter("courseId");
+        Long courseId = null;
+
+        try {
+            courseId = Long.parseLong(courseIdParam);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Invalid courseId format: " + courseIdParam);
         }
 
-        // Gửi email xác nhận nếu thanh toán thành công
+        // Kiểm tra response code từ VNPay
         if ("00".equals(vnp_ResponseCode)) {
-            String emailAddress = getUserEmailById(existingPayment.getUser().getId());
+            // Thanh toán thành công
+            double amountInVND = Double.parseDouble(vnp_Amount) / 100; // Chia cho 100 để lấy đúng giá trị VND
+            double exchangeRate = 25000.0; // Tỉ giá USD -> VND
+            double amountInUSD = amountInVND / exchangeRate;
+            // Định dạng lại amountInUSD với 2 chữ số thập phân
+            String formattedAmountInUSD = String.format("%.2f", amountInUSD);
+            // Tạo DTO thanh toán
+            PaymentDto paymentDto = new PaymentDto();
+            paymentDto.setPrice(new BigDecimal(formattedAmountInUSD));
+            paymentDto.setPaymentDate(LocalDateTime.now());
+            paymentDto.setUserId(userId);
+            paymentDto.setCourseId(courseId);
+            paymentDto.setPaymentStatusId(1L); // COMPLETED
+            paymentDto.setEnrollment(true); // Đã ghi danh
+
+            Payment payment = PaymentMapper.INSTANCE.paymentDtoToPayment(paymentDto);
+            payment.setPaymentId(transactionNo); // Gán mã giao dịch
+
+            paymentRepository.save(payment);
+
+            // Gửi email xác nhận
+            String emailAddress = getUserEmailById(userId);
             String subject = "Payment confirmation";
-            String body = buildEmailBody(transactionNo, amountInUSD); // Truyền số tiền USD vào email body
+            String body = buildEmailBody(transactionNo, amountInUSD);
             emailService.sendEmail(emailAddress, subject, body);
+        } else {
+            throw new RuntimeException("Payment failed or not completed.");
         }
     }
+
+
+    private String buildSuccessUrl(Long courseId, String userId) {
+        try {
+            return String.format(
+                    "http://localhost:8080/api/payments/vnpay/success?courseId=%d&userId=%s",
+                    courseId,
+                    URLEncoder.encode(userId, StandardCharsets.UTF_8)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Error encoding userId", e);
+        }
+    }
+
+
+
 
     private String buildEmailBody(String transactionNo, double amountInUSD) {
         // Định dạng lại số tiền để hiển thị chính xác 2 chữ số sau dấu phẩy
@@ -241,25 +262,14 @@ public class VNPayServiceImpl implements VNPayService {
         return userRepository.findEmailById(userId);
     }
 
-    private void updatePaymentStatus(Payment payment, String vnp_Amount, Long statusId) {
-        // Cập nhật trạng thái thanh toán
-        payment.setPaymentStatus(paymentStatusRepository.findById(statusId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạng thái thanh toán")));
-        // Lưu lại thông tin thanh toán vào database
-        payment.setEnrollment(false);
-        paymentRepository.save(payment);
-    }
-
-    @Scheduled(fixedRate = 60000) // Kiểm tra mỗi 1 phút
-    public void checkPendingPayments() {
-        List<Payment> pendingPayments = paymentRepository.findAllByPaymentStatusId(3L); // ID 3 cho trạng thái PENDING
-        for (Payment payment : pendingPayments) {
-            // Kiểm tra thời gian tạo thanh toán, nếu đã quá 1 phút thì cập nhật thành FAILED
-            if (payment.getPaymentDate().isBefore(LocalDateTime.now().minusMinutes(2))) {
-                updatePaymentStatus(payment, payment.getPrice().toString(), 2L); // Cập nhật thành FAILED
-            }
-        }
-    }
+//    private void updatePaymentStatus(Payment payment, String vnp_Amount, Long statusId) {
+//        // Cập nhật trạng thái thanh toán
+//        payment.setPaymentStatus(paymentStatusRepository.findById(statusId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạng thái thanh toán")));
+//        // Lưu lại thông tin thanh toán vào database
+//        payment.setEnrollment(false);
+//        paymentRepository.save(payment);
+//    }
     @Override
     public String cancelPay() {
         return "Payment was canceled.";

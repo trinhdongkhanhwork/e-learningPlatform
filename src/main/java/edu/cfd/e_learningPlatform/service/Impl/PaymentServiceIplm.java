@@ -33,11 +33,11 @@ public class PaymentServiceIplm implements PaymentService {
         }
     }
     @Override
-    public List<PaymentResponse> getAllPayments() { /// check user: chỉ hiển thị payment của user đó
-        // Fetch all payments from the database
-        List<Payment> payments = paymentRepository.findAll();
+    public List<PaymentResponse> getPaymentHistoryByUserId(String userId) {
+        // Fetch payments for the specific user
+        List<Payment> payments = paymentRepository.findByUser_Id(userId);
 
-        // Map the payments to paymentResponse objects including courseTitle
+        // Map the payments to PaymentResponse objects
         return payments.stream()
                 .map(paymentMapper::paymentToPaymentResponse)
                 .collect(Collectors.toList());

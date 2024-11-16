@@ -24,8 +24,9 @@ public class PaymentController {
     public ResponseEntity<Boolean> isPayment(@PathVariable Long idCourse,@PathVariable String userId){
         return ResponseEntity.ok(paymentService.IsPaymentCourse(idCourse,userId));
     } ///lỗi ở đây
-    @GetMapping
-    public List<PaymentResponse> getAllPayments() {
-        return paymentService.getAllPayments();
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<PaymentResponse>> getPaymentHistory(@PathVariable String userId) {
+        List<PaymentResponse> paymentHistory = paymentService.getPaymentHistoryByUserId(userId);
+        return ResponseEntity.ok(paymentHistory);
     }
 }

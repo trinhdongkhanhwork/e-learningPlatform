@@ -17,12 +17,12 @@ public class WithdrawController {
     private WithdrawService withdrawService;
 
     // API tạo yêu cầu rút tiền
-    @PostMapping("/request")
+    @PostMapping("/request/{userId}")
     public ResponseEntity<?> requestWithdraw(
-            @RequestParam("userId") String userId,
-            @RequestParam("price") BigDecimal amount) {
+            @PathVariable("userId") String userId,
+            @RequestParam("price") BigDecimal price) {
         try {
-            WithdrawDto withdrawDto = withdrawService.requestWithdraw(userId, amount);
+            WithdrawDto withdrawDto = withdrawService.requestWithdraw(userId, price);
             return ResponseEntity.ok(withdrawDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
@@ -33,15 +33,9 @@ public class WithdrawController {
 
     // API tính tổng số tiền
     @GetMapping("/total-payments/{userId}")
-    public ResponseEntity<?> getTotalPayments(@PathVariable("userId") String userId) {
-        try {
-            BigDecimal totalPayments = withdrawService.calculateTotalPayments(userId);
-            return ResponseEntity.ok(totalPayments);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("UserId không tồn tại.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Đã xảy ra lỗi không mong muốn.");
-        }
+    public ResponseEntity<BigDecimal> getTotalPaymentsForInstructor(@PathVariable String userId) {
+        BigDecimal totalPayments = withdrawService.calculateTotalPaymentsForInstructor(userId);
+        return ResponseEntity.ok(totalPayments);
     }
 
     // API lấy lịch sử rút tiền

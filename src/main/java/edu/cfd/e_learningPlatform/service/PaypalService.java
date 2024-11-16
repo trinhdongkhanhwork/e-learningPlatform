@@ -23,4 +23,6 @@ public interface PaypalService {
     void cancelPayment(String paymentId);
 
     String getUserEmailById(String userId);
+
+    boolean hasUserPaidForCourse(String userId, Long courseId);
 }
