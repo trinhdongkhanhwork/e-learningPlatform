@@ -22,21 +22,18 @@ public class WishlistController {
 
     WishlistService wishlistService;
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'STUDENT')")
     @PostMapping("/addWishlist")
     public ResponseEntity<WishlistDtoResponse> addWishlist(@RequestBody WishlistRequest wishlistDto) {
         WishlistDtoResponse savedWishlist = wishlistService.addWishlist(wishlistDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedWishlist);
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'STUDENT')")
     @PutMapping("/updateWishlist/{id}")
     public ResponseEntity<WishlistDtoResponse> updateWS(@PathVariable Long id, @RequestBody WishlistRequest wishlistDto) {
         WishlistDtoResponse updatedWishlist = wishlistService.updateWishlist(id, wishlistDto);
         return ResponseEntity.ok(updatedWishlist);
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'STUDENT')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteWS(@PathVariable("id") Long id) {
         try {
@@ -47,7 +44,6 @@ public class WishlistController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'STUDENT')")
     @GetMapping("/getAllWS/{userId}")
     public ResponseEntity<List<WishlistDtoResponse>> getAllWS(@PathVariable String userId) {
         List<WishlistDtoResponse> wishlist = wishlistService.getAllWishlist(userId);
