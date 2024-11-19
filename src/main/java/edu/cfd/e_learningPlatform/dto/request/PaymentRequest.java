@@ -8,5 +8,4 @@ public class PaymentRequest {
     private Long courseId;
     private String userId;
     private String paymentMethod;
-
 }

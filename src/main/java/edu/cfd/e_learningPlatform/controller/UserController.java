@@ -1,5 +1,11 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import java.util.List;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
@@ -11,11 +17,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -62,9 +63,7 @@ public class UserController {
     @DeleteMapping("/{userId}")
     ApiResponse<String> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
-        return ApiResponse.<String>builder()
-                .result("User has been deleted")
-                .build();
+        return ApiResponse.<String>builder().result("User has been deleted").build();
     }
 
     @PutMapping("/{userId}")
@@ -75,12 +74,11 @@ public class UserController {
     }
 
     @PutMapping("/updatePassWord/{email}/{vail}")
-    ApiResponse<UpdatePassWordResponse> updatePassWord(@PathVariable String email, @PathVariable boolean vail, @RequestBody UpdatePassWordRequest request) {
+    ApiResponse<UpdatePassWordResponse> updatePassWord(
+            @PathVariable String email, @PathVariable boolean vail, @RequestBody UpdatePassWordRequest request) {
         userService.updatePassWord(email, request, vail);
         return ApiResponse.<UpdatePassWordResponse>builder()
-                .result(UpdatePassWordResponse.builder()
-                        .response(vail)
-                        .build())
+                .result(UpdatePassWordResponse.builder().response(vail).build())
                 .build();
     }
 

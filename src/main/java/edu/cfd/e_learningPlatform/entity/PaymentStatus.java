@@ -1,11 +1,12 @@
 package edu.cfd.e_learningPlatform.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @Table(name = "Payment_Statuses")
@@ -23,4 +24,3 @@ public class PaymentStatus {
     @OneToMany(mappedBy = "paymentStatus")
     private List<Payment> payments;
 }
-

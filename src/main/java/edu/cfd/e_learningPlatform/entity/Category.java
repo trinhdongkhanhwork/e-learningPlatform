@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.entity;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "category_name",columnDefinition = "nvarchar(100)")
+    @Column(name = "category_name", columnDefinition = "nvarchar(100)")
     private String categoryName;
 
     private String coverImage;
 }
-

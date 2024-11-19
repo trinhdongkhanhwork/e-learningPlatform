@@ -1,12 +1,11 @@
 package edu.cfd.e_learningPlatform.service;
 
-
-import edu.cfd.e_learningPlatform.dto.WithdrawDto;
-import jakarta.mail.MessagingException;
-
 import java.math.BigDecimal;
 import java.util.List;
 
+import jakarta.mail.MessagingException;
+
+import edu.cfd.e_learningPlatform.dto.WithdrawDto;
 
 public interface WithdrawService {
 

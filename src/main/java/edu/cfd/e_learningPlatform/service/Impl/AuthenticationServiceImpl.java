@@ -1,5 +1,23 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+
 import edu.cfd.e_learningPlatform.dto.request.AuthenticationRequest;
 import edu.cfd.e_learningPlatform.dto.request.ExchangeTokenRequest;
 import edu.cfd.e_learningPlatform.dto.request.IntrospectRequest;
@@ -11,13 +29,8 @@ import edu.cfd.e_learningPlatform.enums.Gender;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import edu.cfd.e_learningPlatform.repository.RoleRepository;
-import edu.cfd.e_learningPlatform.repository.httpClient.OutboundIdentityClient;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
+import edu.cfd.e_learningPlatform.repository.httpClient.OutboundIdentityClient;
 import edu.cfd.e_learningPlatform.repository.httpClient.OutboundUserClient;
 import edu.cfd.e_learningPlatform.service.AuthenticationService;
 import lombok.AccessLevel;
@@ -25,17 +38,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     protected final String GRANT_TYPE = "authorization_code";
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest request)
-            throws JOSEException, ParseException {
+    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
 
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
@@ -101,44 +102,40 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("USER INFO {}", userInfo);
 
         LocalDateTime now = LocalDateTime.now();
-        Role defaultRole = roleRepository.findByRoleName("STUDENT")
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        Role defaultRole =
+                roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        var user = userRepository.findByEmail(userInfo.getEmail()).orElseGet(() -> userRepository.save(User.builder()
-                .username(userInfo.getId())
-                .gender(Gender.PRIVATE)
-                .password("")
-                .email(userInfo.getEmail())
-                .fullname(userInfo.getName())
-                .avatarUrl(userInfo.getPicture())
-                .createdDate(now)
-                .isActive(false)
-                .roleEntity(defaultRole)
-                .build()));
+        var user = userRepository
+                .findByEmail(userInfo.getEmail())
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .username(userInfo.getId())
+                        .gender(Gender.PRIVATE)
+                        .password("")
+                        .email(userInfo.getEmail())
+                        .fullname(userInfo.getName())
+                        .avatarUrl(userInfo.getPicture())
+                        .createdDate(now)
+                        .active(false)
+                        .roleEntity(defaultRole)
+                        .build()));
         var token = generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(token)
-                .build();
+        return AuthenticationResponse.builder().token(token).build();
     }
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        var user = userRepository.findByUsername(request.getUsername())
+        var user = userRepository
+                .findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(),
-                user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
-        if (!authenticated)
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         var token = generateToken(user);
 
-        return AuthenticationResponse.builder()
-                .token(token)
-                .authenticated(true)
-                .build();
+        return AuthenticationResponse.builder().token(token).authenticated(true).build();
     }
 
     private String generateToken(User user) {
@@ -148,9 +145,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .subject(user.getUsername())
                 .issuer("cfd.edu")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
-                ))
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .claim("scope", buildScope(user))
                 .build();
 
@@ -176,6 +171,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return stringJoiner.toString();
     }
-
 }
-

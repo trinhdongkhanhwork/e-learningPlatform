@@ -1,15 +1,14 @@
 package edu.cfd.e_learningPlatform.entity;
 
-
-import edu.cfd.e_learningPlatform.enums.Gender;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
+
+import jakarta.persistence.*;
+
+import edu.cfd.e_learningPlatform.enums.Gender;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
@@ -52,22 +51,21 @@ public class User {
     String avatarUrl;
 
     @Column(name = "updated_date")
-    @Builder.Default
-    LocalDateTime updatedDate = LocalDateTime.now();
+    LocalDateTime updatedDate;
 
     @Column(name = "created_date")
-    @Builder.Default
-    LocalDateTime createdDate = LocalDateTime.now();
+    LocalDateTime createdDate;
 
     @Version
     @Column(name = "version")
     int version;
 
-    @Column(name = "is_active")
-    private boolean isActive;
+    @Column(name = "active", nullable = false)
+    private boolean active;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role roleEntity;
+
     private BigDecimal price;
 }

@@ -1,14 +1,15 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import edu.cfd.e_learningPlatform.dto.SectionDto;
 import edu.cfd.e_learningPlatform.entity.Section;
 import edu.cfd.e_learningPlatform.mapstruct.SectionMapper;
 import edu.cfd.e_learningPlatform.repository.SectionRepository;
 import edu.cfd.e_learningPlatform.service.SectionService;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SectionServiceImpl implements SectionService {

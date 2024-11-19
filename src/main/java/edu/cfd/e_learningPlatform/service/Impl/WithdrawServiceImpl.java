@@ -1,30 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-
-import com.paypal.api.payments.Payout;
-import com.paypal.api.payments.PayoutBatch;
-import com.paypal.api.payments.PayoutItem;
-import com.paypal.api.payments.PayoutSenderBatchHeader;
-import com.paypal.base.rest.APIContext;
-import com.paypal.base.rest.PayPalRESTException;
-import edu.cfd.e_learningPlatform.dto.WithdrawDto;
-import edu.cfd.e_learningPlatform.entity.Course;
-import edu.cfd.e_learningPlatform.entity.Payment;
-import edu.cfd.e_learningPlatform.entity.User;
-import edu.cfd.e_learningPlatform.entity.Withdraw;
-import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
-import edu.cfd.e_learningPlatform.mapstruct.WithdrawMapper;
-import edu.cfd.e_learningPlatform.repository.*;
-import edu.cfd.e_learningPlatform.service.EmailService;
-import edu.cfd.e_learningPlatform.service.WithdrawService;
-import jakarta.mail.MessagingException;
-import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
@@ -32,6 +7,32 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.paypal.api.payments.Payout;
+import com.paypal.api.payments.PayoutBatch;
+import com.paypal.api.payments.PayoutItem;
+import com.paypal.api.payments.PayoutSenderBatchHeader;
+import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.PayPalRESTException;
+
+import edu.cfd.e_learningPlatform.dto.WithdrawDto;
+import edu.cfd.e_learningPlatform.entity.Course;
+import edu.cfd.e_learningPlatform.entity.User;
+import edu.cfd.e_learningPlatform.entity.Withdraw;
+import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
+import edu.cfd.e_learningPlatform.mapstruct.WithdrawMapper;
+import edu.cfd.e_learningPlatform.repository.*;
+import edu.cfd.e_learningPlatform.service.EmailService;
+import edu.cfd.e_learningPlatform.service.WithdrawService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -60,7 +61,8 @@ public class WithdrawServiceImpl implements WithdrawService {
     @Transactional
     @Override
     public WithdrawDto requestWithdraw(String userId, BigDecimal priceInVND) throws MessagingException {
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
         // Kiểm tra số dư của người dùng
@@ -90,36 +92,39 @@ public class WithdrawServiceImpl implements WithdrawService {
 
     private void sendOTPEmail(String email, String otp) throws MessagingException {
         String subject = "Xác thực yêu cầu rút tiền";
-        String content = String.format("<html><body>" +
-                "<p>Mã OTP của bạn để xác thực yêu cầu rút tiền là: <strong>%s</strong>.</p>" +
-                "<p>Vui lòng nhập mã OTP để tiếp tục.</p>" +
-                "</body></html>", otp);
+        String content = String.format(
+                "<html><body>" + "<p>Mã OTP của bạn để xác thực yêu cầu rút tiền là: <strong>%s</strong>.</p>"
+                        + "<p>Vui lòng nhập mã OTP để tiếp tục.</p>"
+                        + "</body></html>",
+                otp);
         emailService.sendEmail(email, subject, content);
     }
 
     private PayoutBatch executePayout(User user, BigDecimal priceInUSD) throws PayPalRESTException {
         // Sử dụng trực tiếp số tiền USD mà không cần chuyển đổi
-        BigDecimal amountInUSD = priceInUSD.setScale(2, RoundingMode.HALF_EVEN);  // Đảm bảo số tiền có 2 chữ số thập phân
+        BigDecimal amountInUSD =
+                priceInUSD.setScale(2, RoundingMode.HALF_EVEN); // Đảm bảo số tiền có 2 chữ số thập phân
 
         // Tạo một đối tượng Payout
         Payout payout = new Payout();
         PayoutSenderBatchHeader senderBatchHeader = new PayoutSenderBatchHeader();
-        senderBatchHeader.setSenderBatchId(UUID.randomUUID().toString())
+        senderBatchHeader
+                .setSenderBatchId(UUID.randomUUID().toString())
                 .setEmailSubject("Bạn vừa nhận được một khoản thanh toán!");
 
         // Tạo mục thanh toán PayPal
         PayoutItem payoutItem = new PayoutItem();
-        payoutItem.setRecipientType("EMAIL")
+        payoutItem
+                .setRecipientType("EMAIL")
                 .setReceiver(user.getEmail())
                 .setAmount(new com.paypal.api.payments.Currency()
-                        .setCurrency("USD")  // Sử dụng USD trực tiếp
+                        .setCurrency("USD") // Sử dụng USD trực tiếp
                         .setValue(amountInUSD.toString())) // Sử dụng số tiền USD đã xác định
                 .setNote("Rút tiền qua PayPal")
                 .setSenderItemId(UUID.randomUUID().toString());
 
         // Đặt tiêu đề và mục thanh toán
-        payout.setSenderBatchHeader(senderBatchHeader)
-                .setItems(Collections.singletonList(payoutItem));
+        payout.setSenderBatchHeader(senderBatchHeader).setItems(Collections.singletonList(payoutItem));
 
         // Thực hiện yêu cầu tạo thanh toán qua PayPal
         return payout.create(apiContext, new HashMap<>());
@@ -161,11 +166,11 @@ public class WithdrawServiceImpl implements WithdrawService {
         return netTotal; // Trả về tổng số tiền đã trừ
     }
 
-
     @Override
     public void confirmWithdraw(Long withdrawId, String otp) {
         // Tìm yêu cầu rút tiền theo withdrawId
-        Withdraw withdraw = withdrawRepository.findById(withdrawId)
+        Withdraw withdraw = withdrawRepository
+                .findById(withdrawId)
                 .orElseThrow(() -> new IllegalArgumentException("Yêu cầu rút tiền không hợp lệ"));
 
         // Kiểm tra trạng thái của yêu cầu rút tiền
@@ -187,7 +192,7 @@ public class WithdrawServiceImpl implements WithdrawService {
 
         try {
             // Thực hiện yêu cầu rút tiền qua PayPal
-            executePayout(user, withdraw.getPrice());  // Truyền số tiền USD vào hàm
+            executePayout(user, withdraw.getPrice()); // Truyền số tiền USD vào hàm
 
             // Cập nhật trạng thái yêu cầu rút tiền thành hoàn tất
             withdraw.setStatus(WithdrawStatus.COMPLETED);
@@ -203,17 +208,20 @@ public class WithdrawServiceImpl implements WithdrawService {
 
     private void sendWithdrawSuccessEmail(String email, BigDecimal amount) throws MessagingException {
         String subject = "Xác nhận rút tiền thành công";
-        String content = String.format("<html><body>" +
-                "<p>Yêu cầu rút tiền của bạn với số tiền <strong>%s VND</strong> đã được xử lý thành công.</p>" +
-                "<p>Xin cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>" +
-                "</body></html>", amount);
+        String content = String.format(
+                "<html><body>"
+                        + "<p>Yêu cầu rút tiền của bạn với số tiền <strong>%s VND</strong> đã được xử lý thành công.</p>"
+                        + "<p>Xin cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>"
+                        + "</body></html>",
+                amount);
 
         emailService.sendEmail(email, subject, content);
     }
 
     @Override
     public List<WithdrawDto> getWithdrawalHistory(String userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
         List<Withdraw> withdrawals = withdrawRepository.findByUser(user);
@@ -240,7 +248,8 @@ public class WithdrawServiceImpl implements WithdrawService {
     }
 
     private boolean isValidOTP(Long withdrawId, String otp) {
-        Withdraw withdraw = withdrawRepository.findById(withdrawId)
+        Withdraw withdraw = withdrawRepository
+                .findById(withdrawId)
                 .orElseThrow(() -> new IllegalArgumentException("Yêu cầu rút tiền không hợp lệ"));
 
         // In ra mã OTP đã lưu và mã OTP nhập vào để kiểm tra
@@ -248,7 +257,9 @@ public class WithdrawServiceImpl implements WithdrawService {
         System.out.println("Mã OTP nhập vào: " + otp);
 
         // Kiểm tra nếu OTP không hợp lệ hoặc đã được sử dụng
-        boolean valid = withdraw.getOtp() != null && withdraw.getOtp().equals(otp) && withdraw.getStatus().equals(WithdrawStatus.PENDING);
+        boolean valid = withdraw.getOtp() != null
+                && withdraw.getOtp().equals(otp)
+                && withdraw.getStatus().equals(WithdrawStatus.PENDING);
 
         if (!valid) {
             System.out.println("OTP không hợp lệ cho yêu cầu rút tiền ID: " + withdrawId);

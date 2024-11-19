@@ -1,12 +1,12 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 import edu.cfd.e_learningPlatform.dto.PaymentDto;
 import edu.cfd.e_learningPlatform.dto.response.PaymentResponse;
 import edu.cfd.e_learningPlatform.entity.Payment;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
@@ -19,7 +19,7 @@ public interface PaymentMapper {
     PaymentDto paymentToPaymentDto(Payment payment);
 
     @Mapping(source = "course.id", target = "courseId")
-    @Mapping(source = "course.title", target = "courseTitle")  // Ánh xạ courseTitle
+    @Mapping(source = "course.title", target = "courseTitle") // Ánh xạ courseTitle
     @Mapping(source = "paymentStatus.id", target = "paymentStatusId")
     PaymentResponse paymentToPaymentResponse(Payment payment);
 

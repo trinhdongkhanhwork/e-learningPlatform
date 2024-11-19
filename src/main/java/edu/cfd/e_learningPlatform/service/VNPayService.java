@@ -1,12 +1,11 @@
 package edu.cfd.e_learningPlatform.service;
 
+import java.util.Map;
+
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.Map;
-
 public interface VNPayService {
-
 
     String createOrder(int total, String orderInfo, String urlReturn);
 

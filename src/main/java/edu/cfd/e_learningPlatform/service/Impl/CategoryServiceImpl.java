@@ -1,5 +1,11 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import edu.cfd.e_learningPlatform.dto.CategoryDto;
 import edu.cfd.e_learningPlatform.entity.Category;
@@ -8,14 +14,6 @@ import edu.cfd.e_learningPlatform.repository.CategoryRepository;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.service.CategoryService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +22,6 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
     private CategoryMapper categoryMapper;
     private CourseRepository courseRepository;
-
 
     @Override
     public List<CategoryDto> getAllCategories(int page, int size) {
@@ -39,6 +36,4 @@ public class CategoryServiceImpl implements CategoryService {
     public long countCoursesByCategory(Long categoryId) {
         return courseRepository.countByCategoryId(categoryId); // Tính số lượng khóa học thuộc categoryId
     }
-
-
 }

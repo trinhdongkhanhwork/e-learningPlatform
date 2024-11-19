@@ -1,14 +1,15 @@
 package edu.cfd.e_learningPlatform.utils;
 
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
 
 @Component
 public class PdfGenerator {
