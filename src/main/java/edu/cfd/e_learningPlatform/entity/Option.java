@@ -1,5 +1,7 @@
 package edu.cfd.e_learningPlatform.entity;
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ public class Option {
 
     @Column(columnDefinition = "nvarchar(255)")
     private String text;
+
     @Column(name = "is_correct", nullable = false)
     private boolean correct;
 }
-

@@ -1,13 +1,14 @@
 package edu.cfd.e_learningPlatform.entity;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Questions")
@@ -27,10 +28,11 @@ public class Question {
 
     @Column(nullable = false, columnDefinition = "nvarchar(500)")
     private String title;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "question",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<Option> options = new ArrayList<>();
 
     @PrePersist

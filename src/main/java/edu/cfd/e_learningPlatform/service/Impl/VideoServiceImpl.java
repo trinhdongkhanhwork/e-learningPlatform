@@ -1,5 +1,10 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import edu.cfd.e_learningPlatform.dto.VideoDto;
 import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
 import edu.cfd.e_learningPlatform.dto.response.VideoInlectureResponse;
@@ -9,10 +14,6 @@ import edu.cfd.e_learningPlatform.repository.CommentRepository;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
 import edu.cfd.e_learningPlatform.service.CommentService;
 import edu.cfd.e_learningPlatform.service.VideoService;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VideoServiceImpl implements VideoService {
@@ -22,7 +23,8 @@ public class VideoServiceImpl implements VideoService {
     private final VideoMapper videoMapper = VideoMapper.INSTANCE;
     private final CommentRepository commentRepository;
 
-    public VideoServiceImpl(VideoRepository videoRepository, CommentService commentService, CommentRepository commentRepository) {
+    public VideoServiceImpl(
+            VideoRepository videoRepository, CommentService commentService, CommentRepository commentRepository) {
         this.videoRepository = videoRepository;
         this.commentService = commentService;
         this.commentRepository = commentRepository;
@@ -69,16 +71,12 @@ public class VideoServiceImpl implements VideoService {
         Video video = videoRepository.findByLecture_Id(lectureId);
         if (video == null) {
             return null;
-        } else  {
+        } else {
             List<CommentVideoResponse> commentVideoResponse = commentService.getCommentVideo(video.getId());
-            if(commentVideoResponse.size() == 0) {
+            if (commentVideoResponse.size() == 0) {
                 commentVideoResponse = null;
             }
-            return new VideoInlectureResponse(
-                    video.getId(),
-                    video.getVideoUrl(),
-                    commentVideoResponse
-            );
+            return new VideoInlectureResponse(video.getId(), video.getVideoUrl(), commentVideoResponse);
         }
     }
 }

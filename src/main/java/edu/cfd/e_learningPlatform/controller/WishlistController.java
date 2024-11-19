@@ -1,18 +1,19 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import java.util.List;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import edu.cfd.e_learningPlatform.dto.request.WishlistRequest;
 import edu.cfd.e_learningPlatform.dto.response.WishlistDtoResponse;
 import edu.cfd.e_learningPlatform.service.WishlistService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/wishlist")
@@ -29,7 +30,8 @@ public class WishlistController {
     }
 
     @PutMapping("/updateWishlist/{id}")
-    public ResponseEntity<WishlistDtoResponse> updateWS(@PathVariable Long id, @RequestBody WishlistRequest wishlistDto) {
+    public ResponseEntity<WishlistDtoResponse> updateWS(
+            @PathVariable Long id, @RequestBody WishlistRequest wishlistDto) {
         WishlistDtoResponse updatedWishlist = wishlistService.updateWishlist(id, wishlistDto);
         return ResponseEntity.ok(updatedWishlist);
     }

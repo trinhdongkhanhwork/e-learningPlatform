@@ -1,9 +1,10 @@
 package edu.cfd.e_learningPlatform.service;
 
-import edu.cfd.e_learningPlatform.dto.response.PaymentResponse;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import edu.cfd.e_learningPlatform.dto.response.PaymentResponse;
 
 @Service
 public interface PaymentService {

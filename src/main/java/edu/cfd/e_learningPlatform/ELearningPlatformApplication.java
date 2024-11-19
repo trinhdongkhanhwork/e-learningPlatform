@@ -10,8 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class ELearningPlatformApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ELearningPlatformApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(ELearningPlatformApplication.class, args);
+    }
 }

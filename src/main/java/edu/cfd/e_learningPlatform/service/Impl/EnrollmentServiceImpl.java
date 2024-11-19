@@ -1,5 +1,6 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import org.springframework.stereotype.Service;
 
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.Payment;
@@ -9,21 +10,22 @@ import edu.cfd.e_learningPlatform.service.EnrollmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
-     PaymentRepository paymentRepository;
-     CourseRepository courseRepository;
+    PaymentRepository paymentRepository;
+    CourseRepository courseRepository;
 
     @Override
     public void confirmEnrollment(String paymentId, Long courseId) {
-        Payment payment = (Payment) paymentRepository.findByPaymentId(paymentId)
+        Payment payment = (Payment) paymentRepository
+                .findByPaymentId(paymentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán cho paymentId: " + paymentId));
 
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository
+                .findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học cho courseId: " + courseId));
 
         // Đặt enrollment thành true khi người dùng xác nhận

@@ -1,11 +1,11 @@
 package edu.cfd.e_learningPlatform.service;
 
+import java.util.List;
+
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
-
-import java.util.List;
 
 public interface UserService {
     UserResponse createUser(UserCreationRequest request);

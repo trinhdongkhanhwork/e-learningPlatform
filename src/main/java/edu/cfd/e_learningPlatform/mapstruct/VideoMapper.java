@@ -1,9 +1,10 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
-import edu.cfd.e_learningPlatform.dto.VideoDto;
-import edu.cfd.e_learningPlatform.entity.Video;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import edu.cfd.e_learningPlatform.dto.VideoDto;
+import edu.cfd.e_learningPlatform.entity.Video;
 
 @Mapper
 public interface VideoMapper {

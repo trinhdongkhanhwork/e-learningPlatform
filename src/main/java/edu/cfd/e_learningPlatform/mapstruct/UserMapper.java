@@ -1,12 +1,13 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
+
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -17,6 +18,4 @@ public interface UserMapper {
     UserResponse toUserResponse(User user);
 
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
-
-
 }

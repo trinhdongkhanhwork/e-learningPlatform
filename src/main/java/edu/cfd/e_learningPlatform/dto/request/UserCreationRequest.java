@@ -1,13 +1,14 @@
 package edu.cfd.e_learningPlatform.dto.request;
 
-import edu.cfd.e_learningPlatform.entity.Role;
-import edu.cfd.e_learningPlatform.enums.Gender;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDateTime;
 import java.util.Date;
+
+import jakarta.validation.constraints.Size;
+
+import edu.cfd.e_learningPlatform.entity.Role;
+import edu.cfd.e_learningPlatform.enums.Gender;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +21,7 @@ public class UserCreationRequest {
 
     @Size(min = 3, message = "INVALID_PASSWORD")
     String password;
+
     String email;
     String fullname;
     Date birthday;
@@ -28,7 +30,6 @@ public class UserCreationRequest {
     String avatarUrl;
     LocalDateTime updatedDate;
     LocalDateTime createdDate;
-    boolean isActive;
+    boolean active;
     Role roleEntity;
 }
-

@@ -1,8 +1,7 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.service.CourseService;
-import edu.cfd.e_learningPlatform.utils.PdfGenerator;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.service.CourseService;
+import edu.cfd.e_learningPlatform.utils.PdfGenerator;
 
 @RestController
 @RequestMapping("/api/courses")
@@ -22,13 +23,13 @@ public class PdfController {
     private PdfGenerator pdfGenerator;
 
     @Autowired
-    private CourseService courseService;  // Service to get the course from DB
+    private CourseService courseService; // Service to get the course from DB
 
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadCoursePdf(@PathVariable Long id) {
         try {
             // Retrieve course information from the database
-            CourseResponse course = courseService.getCourseById(id);  // Assume you have a method to get course by ID
+            CourseResponse course = courseService.getCourseById(id); // Assume you have a method to get course by ID
 
             // Generate the PDF
             byte[] pdfContent = pdfGenerator.generateCoursePdf(course);
