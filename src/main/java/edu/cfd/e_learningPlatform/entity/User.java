@@ -5,8 +5,6 @@ import edu.cfd.e_learningPlatform.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.mapstruct.Named;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -77,4 +75,11 @@ public class User {
 
     @OneToMany(mappedBy = "userFrom")
     private List<Message> messagesFrom;
+
+    @OneToMany(mappedBy = "user")
+    private List<Friend> userFriends;
+
+    @OneToMany(mappedBy = "friend")
+    private List<Friend> friendUsers;
+
 }

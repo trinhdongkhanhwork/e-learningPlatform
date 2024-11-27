@@ -19,7 +19,6 @@ public abstract class CourseMapper {
     @Autowired
     private UserRepository userRepository;
 
-
     public static final CourseMapper INSTANCE = Mappers.getMapper(CourseMapper.class);
 
     @Mapping(source = "instructor", target = "instructor", qualifiedByName = "stringToUser")

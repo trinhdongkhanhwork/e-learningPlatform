@@ -53,7 +53,6 @@ public class MessageServiceImpl implements MessageService {
         message.setCreatedAt(LocalDateTime.now());
         message.setUserTo(request.getIdUserTo() != null ? userRepository.findById(request.getIdUserTo()).orElse(null) : null);
         message.setUserFrom(request.getIdUserFrom() != null ? userRepository.findById(request.getIdUserFrom()).orElse(null) : null);
-        message.setCourse(request.getIdCourse() != null ? courseRepository.findById(request.getIdCourse()).orElse(null) : null);
         return messageMapper.toMessageReponse(messageRepository.save(message));
     }
 }
