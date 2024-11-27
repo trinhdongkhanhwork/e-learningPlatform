@@ -76,10 +76,4 @@ public class User {
     @OneToMany(mappedBy = "userFrom")
     private List<Message> messagesFrom;
 
-    @OneToMany(mappedBy = "user")
-    private List<Friend> userFriends;
-
-    @OneToMany(mappedBy = "friend")
-    private List<Friend> friendUsers;
-
 }
