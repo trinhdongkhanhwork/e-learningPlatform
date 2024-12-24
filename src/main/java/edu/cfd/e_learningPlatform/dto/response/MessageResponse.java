@@ -14,15 +14,11 @@ import lombok.Setter;
 public class MessageResponse {
     private Long id;
     private String message;
-    private String idUserTo;
-    private String nameUserTo;
-    private String avatarUserTo;
     private String idUserFrom;
     private String nameUserFrom;
-    private Long idCourse;
+    private String avatarUserFrom;
+    private Long idAssembly;
     private String urlImage;
     private String urlFile;
-    private String avatarUserFrom;
     private LocalDateTime createdAt;
-    private String type;
 }

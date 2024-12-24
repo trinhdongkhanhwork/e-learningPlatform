@@ -41,6 +41,4 @@ public class Lecture {
     @JoinColumn(name = "section_id")
     @JsonBackReference
     private Section section;
-
-
 }

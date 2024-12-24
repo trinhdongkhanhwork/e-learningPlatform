@@ -23,16 +23,12 @@ public class Message {
     private String message;
 
     @ManyToOne
-    @JoinColumn(name = "userTo")
-    private User userTo;
-
-    @ManyToOne
-    @JoinColumn(name = "userFrom")
+    @JoinColumn(name = "userFromId")
     private User userFrom;
 
     @ManyToOne
-    @JoinColumn(name = "courseId")
-    private Course course;
+    @JoinColumn(name = "assemblyId")
+    private Assembly assembly;
 
     private String urlImage;
 
@@ -40,7 +36,6 @@ public class Message {
 
     private LocalDateTime createdAt;
 
-    private String type;
-
     private boolean recall;
+
 }

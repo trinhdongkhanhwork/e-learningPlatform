@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.entity.Assembly;
 import edu.cfd.e_learningPlatform.entity.Message;
+import edu.cfd.e_learningPlatform.entity.User;
+import edu.cfd.e_learningPlatform.repository.AssemblyRepository;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -24,35 +27,45 @@ import lombok.experimental.FieldDefaults;
 public class MessageServiceImpl implements MessageService {
 
     MessageRepository messageRepository;
-    UserRepository userRepository;
-    CourseRepository courseRepository;
     MessageMapper messageMapper;
+    private final UserRepository userRepository;
+    private final AssemblyRepository assemblyRepository;
 
     @Override
-    public List<MessageResponse> getMessagesToUser(String idUserTo, String idUserFrom) {
-        List<MessageResponse> messageRepons = messageMapper.toMessageReponses(messageRepository.findMessageToUser(idUserTo, idUserFrom));
-        return messageRepons;
+    public List<MessageResponse> getMessageToGroup(Long idGroup) {
+        return messageMapper.messagetoMessageResponses(messageRepository.findMessageToGroup(idGroup));
     }
 
     @Override
-    public List<MessageResponse> getMessagesToCourse(Long idCourse) {
-        List<MessageResponse> messageRepons =
-                messageMapper.toMessageReponses(messageRepository.findMessageToCourse(idCourse));
-        return messageRepons;
+    public MessageResponse sendMessageToGroup(MessageRequest messageRequest) {
+        User user = userRepository.findById(messageRequest.getIdUserFrom()).orElseThrow(() -> new RuntimeException("User not found"));
+        Assembly assembly = assemblyRepository.findById(messageRequest.getIdAssembly()).orElseThrow(() -> new RuntimeException("Assembly not found"));
+        Message message = messageMapper.messageRequestToMessage(messageRequest);
+        message.setId(null);
+        message.setUserFrom(user);
+        message.setCreatedAt(LocalDateTime.now());
+        if(assembly.isActive()){
+            message.setAssembly(assembly);
+            return messageMapper.messagetoMessageResponse(messageRepository.save(message));
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public MessageResponse updateMessageToGroup(MessageRequest messageRequest) {
+        Message message = messageRepository.findById(messageRequest.getId()).orElseThrow(() -> new RuntimeException("Not found message"));
+        message.setMessage(messageRequest.getMessage());
+        return messageMapper.messagetoMessageResponse(messageRepository.save(message));
     }
 
     @Override
     public Long deleteMessage(Long idMessage) {
-        messageRepository.deleteById(idMessage);
-        return idMessage;
+        Message message = messageRepository.findById(idMessage).orElseThrow(() -> new RuntimeException("Not found message"));
+        messageRepository.delete(message);
+        return message.getId();
     }
 
-    @Override
-    public MessageResponse addMessage(MessageRequest request) {
-        Message message = messageMapper.toMessage(request);
-        message.setCreatedAt(LocalDateTime.now());
-        message.setUserTo(request.getIdUserTo() != null ? userRepository.findById(request.getIdUserTo()).orElse(null) : null);
-        message.setUserFrom(request.getIdUserFrom() != null ? userRepository.findById(request.getIdUserFrom()).orElse(null) : null);
-        return messageMapper.toMessageReponse(messageRepository.save(message));
-    }
+
+
 }

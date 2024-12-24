@@ -68,12 +68,15 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role roleEntity;
+
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "userTo")
-    private List<Message> messagesTo;
-
     @OneToMany(mappedBy = "userFrom")
-    private List<Message> messagesFrom;
+    private List<Message> messages;
 
+    @OneToMany(mappedBy = "admin")
+    private List<Assembly> assemblys;
+
+    @ManyToMany(mappedBy = "userAssemblys")
+    private List<Assembly> assemblyUsers;
 }

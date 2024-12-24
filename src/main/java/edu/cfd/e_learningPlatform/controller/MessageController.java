@@ -2,7 +2,10 @@ package edu.cfd.e_learningPlatform.controller;
 
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.dto.request.AssemblyUserRequest;
+import edu.cfd.e_learningPlatform.dto.response.AssemblyUserResponse;
 import edu.cfd.e_learningPlatform.dto.response.EnrollCourseResponse;
+import edu.cfd.e_learningPlatform.service.AssemblyService;
 import edu.cfd.e_learningPlatform.service.CourseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,39 +25,27 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 public class MessageController {
     MessageService messageService;
-    CourseService courseService;
 
-    @GetMapping("toUser/{idUserTo}/{idUserFrom}")
-    public ResponseEntity<List<MessageResponse>> getMessagesToUser(
-            @PathVariable String idUserTo, @PathVariable String idUserFrom) {
-        return ResponseEntity.ok(messageService.getMessagesToUser(idUserTo, idUserFrom));
+    @GetMapping("/group/{id}")
+    public ResponseEntity<List<MessageResponse>> getMessagesToGroup(@PathVariable Long id) {
+        return ResponseEntity.ok(messageService.getMessageToGroup(id));
     }
 
-    @GetMapping("toCourse/{idCourse}")
-    public ResponseEntity<List<MessageResponse>> getMessagesToCourse(
-            @PathVariable Long idCourse) {
-        return ResponseEntity.ok(messageService.getMessagesToCourse(idCourse));
+    @MessageMapping("/sendToGroup")
+    @SendTo("/topic/message")
+    public ResponseEntity<MessageResponse> createMessage(@RequestBody MessageRequest messageRequest) {
+        return ResponseEntity.ok(messageService.sendMessageToGroup(messageRequest));
     }
 
-    @MessageMapping("/messages/send")
-    @SendTo("/topic/messages")
-    public MessageResponse sendMessage(@RequestBody MessageRequest messageRequest) {
-        return messageService.addMessage(messageRequest);
+    @MessageMapping("/updateMessage")
+    @SendTo("/topic/message")
+    public ResponseEntity<MessageResponse> updateMessage(@RequestBody MessageRequest messageRequest) {
+        return ResponseEntity.ok(messageService.updateMessageToGroup(messageRequest));
     }
 
-    @MessageMapping("/messages/delete")
-    @SendTo("/topic/delete")
+    @MessageMapping("/deleteMessage")
+    @SendTo("/topic/deleteMessage")
     public Long deleteMessage(@RequestBody MessageRequest messageRequest) {
         return messageService.deleteMessage(messageRequest.getId());
-    }
-
-    @GetMapping("/getEnrollCourse/{idStudent}")
-    public ResponseEntity<List<EnrollCourseResponse>> getEnrollCourse(@PathVariable String idStudent) {
-        return ResponseEntity.ok(courseService.getEnrollCourses(idStudent));
-    }
-
-    @GetMapping("/getCourseIntructor/{idIntructor}")
-    public ResponseEntity<List<EnrollCourseResponse>> getCourseIntructor(@PathVariable String idIntructor) {
-        return ResponseEntity.ok(courseService.getCoursesIntructor(idIntructor));
     }
 }
