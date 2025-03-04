@@ -14,4 +14,6 @@ public interface EmailService {
     void sendEmailDeleteCourse(Long id);
 
     void sendEmail(String to, String subject, String htmlContent) throws MessagingException;
+
+    void sendPaymentConfirmationEmail(String email, String paymentId, Double price) throws MessagingException;
 }
