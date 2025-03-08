@@ -1,26 +1,21 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import edu.cfd.e_learningPlatform.dto.*;
+import edu.cfd.e_learningPlatform.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import edu.cfd.e_learningPlatform.dto.CourseDto;
 import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
 import edu.cfd.e_learningPlatform.entity.*;
 import edu.cfd.e_learningPlatform.mapstruct.CourseMapper;
 import edu.cfd.e_learningPlatform.mapstruct.CourseMapperForLoad;
-import edu.cfd.e_learningPlatform.repository.CategoryRepository;
-import edu.cfd.e_learningPlatform.repository.CourseRepository;
-import edu.cfd.e_learningPlatform.repository.PaymentRepository;
-import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.CourseService;
 import edu.cfd.e_learningPlatform.service.EmailService;
 
@@ -32,6 +27,11 @@ public class CourseServiceImpl implements CourseService {
     private final EmailService emailService;
     private final PaymentRepository paymentRepository;
     private final CategoryRepository categoryRepository;
+    private final SectionRepository sectionRepository;
+    private final QuestionRepository questionRepository;
+    private final LectureRepository lectureRepository;
+    private final VideoRepository videoRepository;
+    private final OptionRepository optionRepository;
 
     @Autowired
     CourseMapperForLoad courseMapperForLoad;
@@ -42,13 +42,18 @@ public class CourseServiceImpl implements CourseService {
             UserRepository userRepository,
             EmailService emailService,
             PaymentRepository paymentRepository,
-            CategoryRepository categoryRepository) {
+            CategoryRepository categoryRepository, SectionRepository sectionRepository, QuestionRepository questionRepository, LectureRepository lectureRepository, VideoRepository videoRepository, OptionRepository optionRepository) {
         this.courseRepository = courseRepository;
         this.courseMapper = courseMapper;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.paymentRepository = paymentRepository;
         this.categoryRepository = categoryRepository;
+        this.sectionRepository = sectionRepository;
+        this.questionRepository = questionRepository;
+        this.lectureRepository = lectureRepository;
+        this.videoRepository = videoRepository;
+        this.optionRepository = optionRepository;
     }
 
     @Override
@@ -146,10 +151,255 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse updateCourse(Long id, CourseCreationRequest courseCreationRequest) {
-        courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
-        Course course = courseMapper.toCourse(courseCreationRequest);
-        return courseMapper.toCourseResponse(courseRepository.save(course));
+    public CourseResponse updateCourse(Long courseId, CourseCreationRequest courseCreationRequest) {
+        // Tìm Course theo ID
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        // Cập nhật các thuộc tính cơ bản của Course
+        course.setTitle(courseCreationRequest.getTitle());
+        course.setDescription(courseCreationRequest.getDescription());
+        course.setCreatedAt(courseCreationRequest.getCreatedAt());
+        course.setCategory(categoryRepository.findById(courseCreationRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found")));
+        course.setCoverImage(courseCreationRequest.getCoverImage());
+        course.setPrice(courseCreationRequest.getPrice());
+        course.setPublished(false);
+        course.setLevel(courseCreationRequest.getLevel());
+
+        // Cập nhật Sections
+        if (courseCreationRequest.getSections() != null) {
+            List<Section> existingSections = course.getSections();
+            List<Section> updatedSections = new ArrayList<>();
+
+            // Tìm các section bị xóa
+            Set<Long> sectionIds = courseCreationRequest.getSections().stream()
+                    .map(SectionDto::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            List<Section> sectionsToRemove = existingSections.stream()
+                    .filter(section -> !sectionIds.contains(section.getId()))
+                    .collect(Collectors.toList());
+
+            // Xóa các section bị xóa
+            sectionsToRemove.forEach(sectionRepository::delete);
+
+            for (SectionDto sectionRequest : courseCreationRequest.getSections()) {
+                Section section = existingSections.stream()
+                        .filter(existingSection -> existingSection.getId().equals(sectionRequest.getId()))
+                        .findFirst()
+                        .orElse(null); // Không tạo mới nếu không tìm thấy
+
+                if (section != null) {
+                    // Cập nhật các thuộc tính của Section
+                    section.setTitle(sectionRequest.getTitle());
+                    section.setCourse(course); // Đồng bộ hai chiều
+                } else {
+                    // Nếu không tìm thấy section, tạo mới
+                    section = new Section();
+                    section.setTitle(sectionRequest.getTitle());
+                    section.setCourse(course); // Đồng bộ hai chiều
+                }
+
+                // Cập nhật Lectures
+                if (sectionRequest.getLectures() != null) {
+                    List<Lecture> existingLectures = section.getLectures();
+                    List<Lecture> updatedLectures = new ArrayList<>();
+
+                    // Tìm các lecture bị xóa
+                    Set<Long> lectureIds = sectionRequest.getLectures().stream()
+                            .map(LectureDto::getId)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet());
+                    List<Lecture> lecturesToRemove = existingLectures.stream()
+                            .filter(lecture -> !lectureIds.contains(lecture.getId()))
+                            .collect(Collectors.toList());
+
+                    // Xóa các lecture bị xóa
+                    lecturesToRemove.forEach(lectureRepository::delete);
+
+                    for (LectureDto lectureRequest : sectionRequest.getLectures()) {
+                        Lecture lecture = existingLectures.stream()
+                                .filter(existingLecture -> existingLecture.getId().equals(lectureRequest.getId()))
+                                .findFirst()
+                                .orElse(null); // Không tạo mới nếu không tìm thấy
+
+                        if (lecture != null) {
+                            // Cập nhật các thuộc tính của Lecture
+                            lecture.setTitle(lectureRequest.getTitle());
+                            lecture.setType(lectureRequest.getType());
+                            lecture.setSection(section); // Đồng bộ hai chiều
+                        } else {
+                            // Nếu không tìm thấy lecture, tạo mới
+                            lecture = new Lecture();
+                            lecture.setTitle(lectureRequest.getTitle());
+                            lecture.setType(lectureRequest.getType());
+                            lecture.setSection(section); // Đồng bộ hai chiều
+                        }
+
+                        // Cập nhật Videos, Quiz, Questions, Options, etc.
+                        // Tương tự các đối tượng như Lecture, Section, giữ nguyên ID và chỉ cập nhật các thuộc tính
+                        if (lectureRequest.getVideos() != null) {
+                            List<Video> existingVideos = lecture.getVideos();
+                            List<Video> updatedVideos = new ArrayList<>();
+
+                            // Tìm các video bị xóa
+                            Set<Long> videoIds = lectureRequest.getVideos().stream()
+                                    .map(VideoDto::getId)
+                                    .filter(Objects::nonNull)
+                                    .collect(Collectors.toSet());
+                            List<Video> videosToRemove = existingVideos.stream()
+                                    .filter(video -> !videoIds.contains(video.getId()))
+                                    .collect(Collectors.toList());
+
+                            // Xóa các video bị xóa
+                            videosToRemove.forEach(videoRepository::delete);
+
+                            for (VideoDto videoRequest : lectureRequest.getVideos()) {
+                                Video video = existingVideos.stream()
+                                        .filter(existingVideo -> existingVideo.getId().equals(videoRequest.getId()))
+                                        .findFirst()
+                                        .orElse(null); // Không tạo mới nếu không tìm thấy
+
+                                if (video != null) {
+                                    // Cập nhật các thuộc tính của Video
+                                    video.setFileName(videoRequest.getFileName());
+                                    video.setDuration(videoRequest.getDuration());
+                                    video.setVideoUrl(videoRequest.getVideoUrl());
+                                    video.setLecture(lecture); // Đồng bộ hai chiều
+                                } else {
+                                    // Nếu không tìm thấy video, tạo mới
+                                    video = new Video();
+                                    video.setFileName(videoRequest.getFileName());
+                                    video.setDuration(videoRequest.getDuration());
+                                    video.setVideoUrl(videoRequest.getVideoUrl());
+                                    video.setLecture(lecture); // Đồng bộ hai chiều
+                                }
+
+                                updatedVideos.add(video);
+                            }
+
+                            existingVideos.clear();
+                            existingVideos.addAll(updatedVideos);
+                        }
+
+                        // Cập nhật Quiz
+                        if (lectureRequest.getQuiz() != null) {
+                            Quiz quiz = lecture.getQuiz();
+                            if (quiz == null) {
+                                quiz = new Quiz();
+                                lecture.setQuiz(quiz); // Liên kết mới nếu cần
+                            }
+
+                            quiz.setTitle(lectureRequest.getQuiz().getTitle());
+                            quiz.setLecture(lecture); // Đồng bộ hai chiều
+
+                            // Cập nhật Questions
+                            if (lectureRequest.getQuiz().getQuestions() != null) {
+                                List<Question> existingQuestions = quiz.getQuestions();
+                                List<Question> updatedQuestions = new ArrayList<>();
+
+                                // Tìm các question bị xóa
+                                Set<Long> questionIds = lectureRequest.getQuiz().getQuestions().stream()
+                                        .map(QuestionDto::getId)
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toSet());
+                                List<Question> questionsToRemove = existingQuestions.stream()
+                                        .filter(question -> !questionIds.contains(question.getId()))
+                                        .collect(Collectors.toList());
+
+                                // Xóa các question bị xóa
+                                questionsToRemove.forEach(questionRepository::delete);
+
+                                for (QuestionDto questionRequest : lectureRequest.getQuiz().getQuestions()) {
+                                    Question question = existingQuestions.stream()
+                                            .filter(existingQuestion -> existingQuestion.getId().equals(questionRequest.getId()))
+                                            .findFirst()
+                                            .orElse(null); // Không tạo mới nếu không tìm thấy
+
+                                    if (question != null) {
+                                        // Cập nhật các thuộc tính của Question
+                                        question.setTitle(questionRequest.getTitle());
+                                        question.setQuestionType(questionRequest.getType());
+                                        question.setQuiz(quiz); // Đồng bộ hai chiều
+                                    } else {
+                                        // Nếu không tìm thấy question, tạo mới
+                                        question = new Question();
+                                        question.setTitle(questionRequest.getTitle());
+                                        question.setQuestionType(questionRequest.getType());
+                                        question.setQuiz(quiz); // Đồng bộ hai chiều
+                                    }
+
+                                    // Cập nhật Options
+                                    if (questionRequest.getOptions() != null) {
+                                        List<Option> existingOptions = question.getOptions();
+                                        List<Option> updatedOptions = new ArrayList<>();
+
+                                        // Tìm các option bị xóa
+                                        Set<Long> optionIds = questionRequest.getOptions().stream()
+                                                .map(OptionDto::getId)
+                                                .filter(Objects::nonNull)
+                                                .collect(Collectors.toSet());
+                                        List<Option> optionsToRemove = existingOptions.stream()
+                                                .filter(option -> !optionIds.contains(option.getId()))
+                                                .collect(Collectors.toList());
+
+                                        // Xóa các option bị xóa
+                                        optionsToRemove.forEach(optionRepository::delete);
+
+                                        for (OptionDto optionRequest : questionRequest.getOptions()) {
+                                            Option option = existingOptions.stream()
+                                                    .filter(existingOption -> existingOption.getId().equals(optionRequest.getId()))
+                                                    .findFirst()
+                                                    .orElse(null); // Không tạo mới nếu không tìm thấy
+
+                                            if (option != null) {
+                                                // Cập nhật các thuộc tính của Option
+                                                option.setText(optionRequest.getText());
+                                                option.setCorrect(optionRequest.isCorrect());
+                                                option.setQuestion(question); // Đồng bộ hai chiều
+                                            } else {
+                                                // Nếu không tìm thấy option, tạo mới
+                                                option = new Option();
+                                                option.setText(optionRequest.getText());
+                                                option.setCorrect(optionRequest.isCorrect());
+                                                option.setQuestion(question); // Đồng bộ hai chiều
+                                            }
+
+                                            updatedOptions.add(option);
+                                        }
+
+                                        existingOptions.clear();
+                                        existingOptions.addAll(updatedOptions);
+                                    }
+
+                                    updatedQuestions.add(question);
+                                }
+
+                                existingQuestions.clear();
+                                existingQuestions.addAll(updatedQuestions);
+                            }
+                        }
+
+                        updatedLectures.add(lecture);
+                    }
+
+                    existingLectures.clear();
+                    existingLectures.addAll(updatedLectures);
+                }
+
+                updatedSections.add(section);
+            }
+
+            existingSections.clear();
+            existingSections.addAll(updatedSections);
+        }
+
+        // Lưu toàn bộ thực thể được cập nhật với cascade
+        course = courseRepository.save(course);
+
+        // Trả về CourseResponse sau khi cập nhật
+        return courseMapper.toCourseResponse(course);
     }
 
     @Override

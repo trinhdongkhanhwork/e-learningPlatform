@@ -32,7 +32,7 @@ public class ApplicationInitConfig {
     RoleRepository roleRepository;
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring")
+    @ConditionalOnProperty(prefix = "spring", name = "some.property", havingValue = "true")
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
             if (roleRepository.count() == 0) {
