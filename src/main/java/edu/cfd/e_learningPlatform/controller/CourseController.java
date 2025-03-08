@@ -32,6 +32,14 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createCourse(courseCreationRequest));
     }
 
+    @PutMapping("/{courseId}")
+    public ResponseEntity<CourseResponse> updateCourse(
+            @PathVariable Long courseId,
+            @RequestBody CourseCreationRequest courseCreationRequest) {
+        CourseResponse updatedCourse = courseService.updateCourse(courseId, courseCreationRequest);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
     @GetMapping
     public ResponseEntity<Page<CourseResponse>> getAllCourses(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size) {
