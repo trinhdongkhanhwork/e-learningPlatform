@@ -1,12 +1,13 @@
 package edu.cfd.e_learningPlatform.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Payments")
@@ -28,7 +29,7 @@ public class Payment {
 
     private BigDecimal price;
 
-    private LocalDateTime paymentDate= LocalDateTime.now();
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
     @Column(name = "enrollment", columnDefinition = "bit")
     private Boolean enrollment;

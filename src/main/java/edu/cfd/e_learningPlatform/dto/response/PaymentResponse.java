@@ -1,9 +1,9 @@
 package edu.cfd.e_learningPlatform.dto.response;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import lombok.Data;
 
 @Data
 public class PaymentResponse {
@@ -13,6 +13,6 @@ public class PaymentResponse {
     private LocalDateTime paymentDate;
     private Long courseId;
     private Long paymentStatusId;
-    private Boolean  enrollment;
-    private String courseTitle;  // Thêm trường courseTitle vào PaymentDto
+    private Boolean enrollment;
+    private String courseTitle; // Thêm trường courseTitle vào PaymentDto
 }

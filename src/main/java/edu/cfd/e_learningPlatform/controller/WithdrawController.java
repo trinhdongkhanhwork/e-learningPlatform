@@ -1,13 +1,14 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import edu.cfd.e_learningPlatform.dto.WithdrawDto;
-import edu.cfd.e_learningPlatform.service.WithdrawService;
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
+import edu.cfd.e_learningPlatform.dto.WithdrawDto;
+import edu.cfd.e_learningPlatform.service.WithdrawService;
 
 @RestController
 @RequestMapping("/api/withdraw")
@@ -19,8 +20,7 @@ public class WithdrawController {
     // API tạo yêu cầu rút tiền
     @PostMapping("/request/{userId}")
     public ResponseEntity<?> requestWithdraw(
-            @PathVariable("userId") String userId,
-            @RequestParam("price") BigDecimal price) {
+            @PathVariable("userId") String userId, @RequestParam("price") BigDecimal price) {
         try {
             WithdrawDto withdrawDto = withdrawService.requestWithdraw(userId, price);
             return ResponseEntity.ok(withdrawDto);
@@ -52,5 +52,3 @@ public class WithdrawController {
         return ResponseEntity.ok("Withdraw confirmed");
     }
 }
-
-

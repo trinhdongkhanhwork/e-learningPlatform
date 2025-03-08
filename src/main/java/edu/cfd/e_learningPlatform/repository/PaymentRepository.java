@@ -17,16 +17,14 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    List<Payment> findByPaymentId(String paymentId);
+    Optional<Object> findByPaymentId(String transactionNo);
 
     long countByCourseIdAndEnrollmentTrue(Long courseId);
 
     @Query("select p from Payment p where p.user.id = :userId and p.course.id = :idCourse and p.enrollment = true")
     Payment findByPaymentisErollment(Long idCourse, String userId);
-
     @Query("SELECT SUM(p.price) FROM Payment p WHERE p.course.id = :courseId AND p.paymentStatus.id = 1") // chỉ tính thanh toán thành công
     BigDecimal sumPriceByCourseId(@Param("courseId") Long courseId);
-
     List<Payment> findByUser_Id(String userId);
 
     List<Payment> findAllByPaymentStatusId(long l);

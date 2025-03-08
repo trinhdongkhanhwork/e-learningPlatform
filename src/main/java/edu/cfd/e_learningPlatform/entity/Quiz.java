@@ -1,12 +1,14 @@
 package edu.cfd.e_learningPlatform.entity;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Quizzes")
@@ -24,6 +26,7 @@ public class Quiz {
 
     @Column(nullable = false, columnDefinition = "nvarchar(200)")
     private String title;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -41,4 +44,3 @@ public class Quiz {
         updatedAt = LocalDateTime.now();
     }
 }
-

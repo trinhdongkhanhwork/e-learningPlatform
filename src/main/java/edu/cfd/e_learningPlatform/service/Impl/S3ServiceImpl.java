@@ -1,19 +1,22 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
-import edu.cfd.e_learningPlatform.entity.Video;
-import edu.cfd.e_learningPlatform.repository.VideoRepository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
+
+import edu.cfd.e_learningPlatform.entity.Video;
+import edu.cfd.e_learningPlatform.repository.VideoRepository;
 
 @Service
 public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Service {
@@ -32,7 +35,8 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
     @Override
     public String uploadImage(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        PutObjectRequest putRequest = new PutObjectRequest(BUCKET_NAME, fileName, file.getInputStream(), new ObjectMetadata());
+        PutObjectRequest putRequest =
+                new PutObjectRequest(BUCKET_NAME, fileName, file.getInputStream(), new ObjectMetadata());
         amazonS3.putObject(putRequest);
         return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName;
     }
@@ -82,16 +86,16 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
 
             } catch (Exception e) {
                 // Hủy tải lên nhiều phần nếu có lỗi xảy ra
-                amazonS3.abortMultipartUpload(new AbortMultipartUploadRequest(
-                        BUCKET_NAME, fileName, initResponse.getUploadId()));
+                amazonS3.abortMultipartUpload(
+                        new AbortMultipartUploadRequest(BUCKET_NAME, fileName, initResponse.getUploadId()));
                 throw new IOException("Upload failed", e);
             }
 
-            //Lấy thông tin video
+            // Lấy thông tin video
             Video video = new Video();
             video.setFileName(fileName);
             video.setDuration(getVideoDuration(file));
-            video.setVideoUrl("https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName);
+            video.setVideoUrl("https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName + UUID.randomUUID());
             videos.add(video);
 
             // Update video list
@@ -120,25 +124,10 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
     }
 
     private String formatDuration(String durationStr) {
-        try {
-            // Chuyển đổi chuỗi thời gian thành số nguyên (giây)
-            double durationInSeconds = Double.parseDouble(durationStr);
+        // Chuyển đổi chuỗi thời gian thành số nguyên (giây)
+        int durationInSeconds = Integer.parseInt(durationStr);
 
-            if (durationInSeconds < 60) {
-                // Nếu nhỏ hơn 60 giây, trả về giá trị giây
-                return String.format("%.2f seconds", durationInSeconds);
-            } else if (durationInSeconds < 3600) {
-                // Nếu nhỏ hơn 60 phút, chuyển sang phút
-                int minutes = (int) (durationInSeconds / 60);
-                return String.format("%d minutes", minutes);
-            } else {
-                // Nếu lớn hơn hoặc bằng 60 phút, chuyển sang giờ
-                int hours = (int) (durationInSeconds / 3600);
-                int minutes = (int) ((durationInSeconds % 3600) / 60);
-                return String.format("%d hours"+" %d minutes", hours, minutes);
-            }
-        } catch (NumberFormatException e) {
-            return "Invalid duration format";
-        }
+        // Nếu nhỏ hơn 60 giây, trả về giá trị giây
+        return String.valueOf(durationInSeconds);
     }
 }
