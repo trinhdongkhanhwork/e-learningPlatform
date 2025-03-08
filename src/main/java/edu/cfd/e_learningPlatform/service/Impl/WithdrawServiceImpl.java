@@ -44,7 +44,6 @@ public class WithdrawServiceImpl implements WithdrawService {
     WithdrawMapper withdrawMapper;
     WithdrawRepository withdrawRepository;
     CourseRepository courseRepository;
-    PaymentStatusRepository paymentStatusRepository;
     private static final int OTP_LENGTH = 6; // Độ dài OTP
     private static final SecureRandom random = new SecureRandom();
 

@@ -285,7 +285,7 @@ public class PaypalServiceImpl implements PaypalService {
             if (email != null) {
                 emailService.sendPaymentConfirmationEmail(email, paymentId, price);
             }
-            return String.format("http://localhost:8081/vue/payment-success", paymentId, courseIds);
+            return String.format("http://localhost:8081/vue/payment-success");
         }
         return null;
     }
