@@ -1,18 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Random;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.exception.AppException;
@@ -20,9 +7,21 @@ import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Random;
+
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +42,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOTPEmail(String email, String otp) throws MessagingException {
-        if (!userRepository.existsByEmail(email)) throw new AppException(ErrorCode.USER_EXISTED);
+        if (!userRepository.existsByEmail(email))
+            throw new AppException(ErrorCode.USER_EXISTED);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -54,15 +54,15 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public boolean verifyOTP(
-            String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime) {
+    public boolean verifyOTP(String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime) {
         return encryptedOtp != null
                 && passwordEncoder.matches(request, encryptedOtp)
                 && Duration.between(creationTime, expirationTime).getSeconds() <= 120;
+
     }
 
     @Override
-    public void sendOTPEmailForCreationUser(String email, String username, String otp) throws MessagingException {
+    public void sendOTPEmailForCreationUser(String email,String username, String otp) throws MessagingException {
         if (userRepository.existsByEmail(email) && userRepository.existsByUsername(username))
             throw new AppException(ErrorCode.USER_EXISTED);
 
@@ -79,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
         Course course = courseRepository.findByCourseName(approvedCourseRequest.getCourseName());
         if (course == null) {
             throw new RuntimeException("Course not found");
-        } else {
+        }else {
             course.setPublished(approvedCourseRequest.isCourseStatus());
             courseRepository.save(course);
         }
@@ -88,15 +88,13 @@ public class EmailServiceImpl implements EmailService {
         helper.setSubject("Course status information: " + approvedCourseRequest.getCourseName());
         helper.setTo(approvedCourseRequest.getEmail());
 
-        String htmlContent = "<html><body>" + "<p>Hello "
-                + course.getInstructor().getFullname() + ",</p>" + "<p>Your Course: <strong>"
-                + approvedCourseRequest.getCourseName() + "</strong> now in status: "
-                + (approvedCourseRequest.isCourseStatus()
-                        ? "<span style='color:green;'>Published</span>"
-                        : "<span style='color:red;'>Draft</span>")
-                + "</p>"
-                + "<p>"
-                + approvedCourseRequest.getText() + "</p>" + "</body></html>";
+        String htmlContent = "<html><body>" +
+                "<p>Hello " + course.getInstructor().getFullname() + ",</p>" +
+                "<p>Your Course: <strong>" + approvedCourseRequest.getCourseName() + "</strong> now in status: " +
+                (approvedCourseRequest.isCourseStatus() ? "<span style='color:green;'>Published</span>" : "<span style='color:red;'>Draft</span>") +
+                "</p>" +
+                "<p>" + approvedCourseRequest.getText() + "</p>" +
+                "</body></html>";
 
         helper.setText(htmlContent, true);
         mailSender.send(mimeMessage);
@@ -111,7 +109,6 @@ public class EmailServiceImpl implements EmailService {
         message.setText("Your course: " + course.getTitle() + " has been deleted");
         mailSender.send(message);
     }
-
     @Override
     public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -137,4 +134,3 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, "Payment Confirmation", htmlContent);
     }
 }
-
