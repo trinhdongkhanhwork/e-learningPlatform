@@ -25,10 +25,8 @@ public class EmailController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> approvedCourse(
-            @Valid @RequestBody ApprovedCourseRequest approvedCourseRequest) throws MessagingException {
+    public ResponseEntity<Map<String, String>> approvedCourse(@Valid @RequestBody ApprovedCourseRequest approvedCourseRequest) throws MessagingException {
         emailService.sendEmailApprovedCourse(approvedCourseRequest);
-        return ResponseEntity.ok(
-                Map.of("message", "Email sent to: " + approvedCourseRequest.getEmail() + " successfully"));
+        return ResponseEntity.ok(Map.of("message", "Email sent to: " +approvedCourseRequest.getEmail()+" successfully"));
     }
 }
