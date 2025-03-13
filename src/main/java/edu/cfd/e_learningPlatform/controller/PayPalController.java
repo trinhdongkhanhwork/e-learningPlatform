@@ -1,26 +1,27 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import com.paypal.api.payments.Payment;
+
 import com.paypal.base.rest.PayPalRESTException;
 import edu.cfd.e_learningPlatform.dto.request.PaymentRequest;
 import edu.cfd.e_learningPlatform.dto.response.PaymentResponseDto;
 import edu.cfd.e_learningPlatform.service.PaypalService;
 import jakarta.mail.MessagingException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments/paypal")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class PayPalController {
 
-    @Autowired
-    private PaypalService paypalService;
+   PaypalService paypalService;
 
     @PostMapping("/pay")
     public ResponseEntity<?> pay(@RequestBody PaymentRequest request) {

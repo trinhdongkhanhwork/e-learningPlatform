@@ -1,23 +1,23 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import edu.cfd.e_learningPlatform.dto.*;
+import edu.cfd.e_learningPlatform.dto.request.*;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.entity.*;
+import edu.cfd.e_learningPlatform.exception.AppException;
+import edu.cfd.e_learningPlatform.exception.ErrorCode;
+import edu.cfd.e_learningPlatform.mapstruct.CourseMapper;
 import edu.cfd.e_learningPlatform.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import edu.cfd.e_learningPlatform.service.CourseService;
+import edu.cfd.e_learningPlatform.service.EmailService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.entity.*;
-import edu.cfd.e_learningPlatform.mapstruct.CourseMapper;
-import edu.cfd.e_learningPlatform.mapstruct.CourseMapperForLoad;
-import edu.cfd.e_learningPlatform.service.CourseService;
-import edu.cfd.e_learningPlatform.service.EmailService;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -28,21 +28,13 @@ public class CourseServiceImpl implements CourseService {
     private final PaymentRepository paymentRepository;
     private final CategoryRepository categoryRepository;
     private final SectionRepository sectionRepository;
+    private final OptionRepository optionRepository;
+    private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final LectureRepository lectureRepository;
     private final VideoRepository videoRepository;
-    private final OptionRepository optionRepository;
 
-    @Autowired
-    CourseMapperForLoad courseMapperForLoad;
-
-    public CourseServiceImpl(
-            CourseRepository courseRepository,
-            CourseMapper courseMapper,
-            UserRepository userRepository,
-            EmailService emailService,
-            PaymentRepository paymentRepository,
-            CategoryRepository categoryRepository, SectionRepository sectionRepository, QuestionRepository questionRepository, LectureRepository lectureRepository, VideoRepository videoRepository, OptionRepository optionRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper, UserRepository userRepository, EmailService emailService, PaymentRepository paymentRepository, CategoryRepository categoryRepository, SectionRepository sectionRepository, OptionRepository optionRepository, QuizRepository quizRepository, QuestionRepository questionRepository, LectureRepository lectureRepository, VideoRepository videoRepository) {
         this.courseRepository = courseRepository;
         this.courseMapper = courseMapper;
         this.userRepository = userRepository;
@@ -50,23 +42,23 @@ public class CourseServiceImpl implements CourseService {
         this.paymentRepository = paymentRepository;
         this.categoryRepository = categoryRepository;
         this.sectionRepository = sectionRepository;
+        this.optionRepository = optionRepository;
+        this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.lectureRepository = lectureRepository;
         this.videoRepository = videoRepository;
-        this.optionRepository = optionRepository;
     }
 
     @Override
     public CourseResponse createCourse(CourseCreationRequest courseCreationRequest) {
         Course course = courseMapper.toCourse(courseCreationRequest);
-        course.setInstructor(userRepository
-                .findById(courseCreationRequest.getInstructor())
-                .orElseThrow(
-                        () -> new RuntimeException("Instructor not found"))); // Thiết lập quan hệ giữa Course và User
-        course.setCategory(categoryRepository
-                .findById(courseCreationRequest.getCategoryId())
-                .orElseThrow(
-                        () -> new RuntimeException("Category not found"))); // Thiết lập quan hệ giữa Course và Category
+        course.setInstructor(userRepository.findById(courseCreationRequest.getInstructor())
+                .orElseThrow(() -> new RuntimeException("Instructor not found"))); // Thiết lập quan hệ giữa Course và User
+//        course.setCategory(categoryRepository.findById(courseCreationRequest.getCategoryId())
+//                .orElseThrow(() -> new RuntimeException("Category not found"))); // Thiết lập quan hệ giữa Course và Category
+
+        course.setCategory(categoryRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Category not found")));
         // Thiết lập quan hệ trước khi lưu
         if (course.getSections() != null) {
             for (Section section : course.getSections()) {
@@ -104,6 +96,8 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toCourseResponse(course);
     }
 
+
+
     @Override
     public Page<CourseResponse> getAllCourses(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -127,8 +121,7 @@ public class CourseServiceImpl implements CourseService {
             courseResponse.setEnrolledUserCount(enrolledCount);
 
             // Thêm số lượng khóa học thuộc danh mục vào thông tin của mỗi khóa học
-            long courseCountInCategory =
-                    categoryCourseCount.getOrDefault(course.getCategory().getId(), 0L);
+            long courseCountInCategory = categoryCourseCount.getOrDefault(course.getCategory().getId(), 0L);
             courseResponse.setCategoryCourseCount(courseCountInCategory);
 
             return courseResponse;
@@ -136,6 +129,7 @@ public class CourseServiceImpl implements CourseService {
 
         return courseResponses;
     }
+
 
     @Override
     public CourseResponse getCourseById(Long id) {
@@ -402,20 +396,27 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toCourseResponse(course);
     }
 
+
     @Override
-    public void deleteCourse(Long id) {
-        courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+    public void markForDeletion(Long id) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(()-> new AppException(ErrorCode.COURSE_NOT_FOUND));
+
+        course.setPublished(false);
+        course.setPendingDelete(true);
+
         emailService.sendEmailDeleteCourse(id);
-        courseRepository.deleteById(id);
+
+        courseRepository.save(course);
     }
 
     @Override
-    public CourseDto getCourseByIdForLoad(Long courseId) {
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
-        if (courseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Khóa học không tồn tại với ID: " + courseId);
-        }
-
-        return courseMapperForLoad.toDto(courseOptional.get());
+    public void deleteCourse(Long id) {
+        courseRepository.findById(id)
+                .orElseThrow(()-> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        //gửi mail thông báo đã xóa khóa học
+        emailService.sendEmailDeleteCourse(id);
+        //thực hiện xóa
+        courseRepository.deleteById(id);
     }
 }
