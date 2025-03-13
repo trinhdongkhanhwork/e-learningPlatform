@@ -1,10 +1,9 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.time.LocalDateTime;
-
+import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
 import jakarta.mail.MessagingException;
 
-import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
+import java.time.LocalDateTime;
 
 public interface EmailService {
     String generateOTP(String email);
@@ -15,4 +14,6 @@ public interface EmailService {
     void sendEmailDeleteCourse(Long id);
 
     void sendEmail(String to, String subject, String htmlContent) throws MessagingException;
+
+    void sendPaymentConfirmationEmail(String email, String paymentId, Double price) throws MessagingException;
 }

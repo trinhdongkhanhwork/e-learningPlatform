@@ -419,6 +419,4 @@ public class CourseServiceImpl implements CourseService {
         //thực hiện xóa
         courseRepository.deleteById(id);
     }
-
-
 }

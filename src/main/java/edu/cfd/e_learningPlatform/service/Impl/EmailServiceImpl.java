@@ -119,4 +119,18 @@ public class EmailServiceImpl implements EmailService {
 
         mailSender.send(mimeMessage);
     }
+    @Override
+    public void sendPaymentConfirmationEmail(String email, String paymentId, Double price) throws MessagingException {
+        String htmlContent = String.format(
+                "<html><body>" +
+                        "<h1>Payment Confirmation</h1>" +
+                        "<p>Your payment has been processed successfully.</p>" +
+                        "<ul>" +
+                        "<li><strong>Payment ID:</strong> %s</li>" +
+                        "<li><strong>Amount:</strong> %.2f USD</li>" +
+                        "</ul>" +
+                        "</body></html>", paymentId, price
+        );
+        sendEmail(email, "Payment Confirmation", htmlContent);
+    }
 }
