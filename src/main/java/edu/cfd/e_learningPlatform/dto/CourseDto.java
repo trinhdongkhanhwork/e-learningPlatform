@@ -1,10 +1,11 @@
 package edu.cfd.e_learningPlatform.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -12,25 +13,12 @@ import lombok.NoArgsConstructor;
 public class CourseDto {
     private Long id;
     private String title;
+    private String description;
+    private String coverImage;
+    private BigDecimal price;
+    private String level;
+    private boolean isPublished;
+    private Long categoryId;
+    private Long instructorId;
     private List<SectionDto> sections;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SectionDto {
-        private Long id;
-        private String title;
-        private List<LectureDto> lectures;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class LectureDto {
-        private Long id;
-        private String title;
-        private String type;
-        private String content;
-        private boolean completed;
-    }
 }

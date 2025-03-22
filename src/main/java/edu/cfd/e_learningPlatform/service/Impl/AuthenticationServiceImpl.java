@@ -114,7 +114,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .email(userInfo.getEmail())
                         .fullname(userInfo.getName())
                         .avatarUrl(userInfo.getPicture())
-                        .createdDate(now)
                         .active(false)
                         .roleEntity(defaultRole)
                         .build()));

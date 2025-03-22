@@ -12,5 +12,4 @@ public interface AssignmentMapper {
 
     AssignmentDto toAssignmentDto(Assignment assignment);
 
-    Assignment toAssignment(AssignmentDto assignmentDto);
 }

@@ -1,5 +1,8 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
+import edu.cfd.e_learningPlatform.dto.response.QuizResponse;
+import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+import edu.cfd.e_learningPlatform.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -12,5 +15,5 @@ public interface QuizMapper {
 
     QuizDto quizToQuizDto(Quiz quiz);
 
-    Quiz quizDtoToQuiz(QuizDto quizDto);
+    QuizResponse toQuizResponse(Quiz quiz);
 }

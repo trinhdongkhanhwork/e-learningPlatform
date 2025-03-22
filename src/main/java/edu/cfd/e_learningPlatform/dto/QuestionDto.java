@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionDto {
     private Long id;
-    private int points;
     private String type;
     private String title;
     private List<OptionDto> options;

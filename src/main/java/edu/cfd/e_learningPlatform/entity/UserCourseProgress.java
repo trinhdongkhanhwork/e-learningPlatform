@@ -1,9 +1,7 @@
 package edu.cfd.e_learningPlatform.entity;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,17 +10,20 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "userCourseProgress")
+@Table(name = "user_course_progress",
+        indexes = {@Index(name = "idx_user_course", columnList = "user_id, course_id")})
 public class UserCourseProgress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false)
-    private Long courseId;
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Column(nullable = false)
     private Long sectionId;
@@ -30,8 +31,8 @@ public class UserCourseProgress {
     @Column(nullable = false)
     private Long lectureId;
 
-    @Column(nullable = false)
-    private Boolean completed = false;
+    @Enumerated(EnumType.STRING)
+    private ProgressStatus status = ProgressStatus.NOT_STARTED;
 
     private Integer timeSpent;
 
@@ -39,4 +40,8 @@ public class UserCourseProgress {
 
     @Column(nullable = false)
     private LocalDateTime progressTimestamp = LocalDateTime.now();
+
+    public enum ProgressStatus {
+        NOT_STARTED, IN_PROGRESS, COMPLETED
+    }
 }
