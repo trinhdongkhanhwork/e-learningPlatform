@@ -36,7 +36,7 @@ public class PdfController {
 
             // Return the PDF as a downloadable file
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "application/pdf");
+            headers.add("Content-Type", "application.properties/pdf");
             headers.add("Content-Disposition", "attachment; filename=course_" + course.getId() + ".pdf");
 
             return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);

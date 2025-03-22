@@ -9,6 +9,8 @@ import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
@@ -18,4 +20,6 @@ public interface UserMapper {
     UserResponse toUserResponse(User user);
 
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
+
+    List<UserResponse> toUserResponses(List<User> user);
 }
