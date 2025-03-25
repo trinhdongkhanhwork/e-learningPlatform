@@ -1,5 +1,6 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
@@ -63,4 +64,11 @@ public class CourseController {
         CourseDto courseDto = courseService.getCourseByIdForLoad(id);
         return ApiResponse.<CourseDto>builder().result(courseDto).build();
     }
+
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<CourseResponse>> getCoursesByCategoryId(@PathVariable Long categoryId){
+        List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
+        return ResponseEntity.ok(courses);
+    }
+
 }

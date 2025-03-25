@@ -36,4 +36,38 @@ public class CategoryServiceImpl implements CategoryService {
     public long countCoursesByCategory(Long categoryId) {
         return courseRepository.countByCategoryId(categoryId); // Tính số lượng khóa học thuộc categoryId
     }
+
+    @Override
+    public CategoryDto getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+        return categoryMapper.CategoryToCategoryDto(category);
+    }
+
+    @Override
+    public CategoryDto createCategory(CategoryDto categoryDto) {
+        Category category = categoryMapper.CategoryDtoToCategory(categoryDto);
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.CategoryToCategoryDto(savedCategory);
+    }
+
+    @Override
+    public CategoryDto updateCategory(Long id, CategoryDto categoryDto) {
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+        existingCategory.setCategoryName(categoryDto.getCategoryName());
+        if (categoryDto.getCoverImage() != null) {
+            existingCategory.setCoverImage(categoryDto.getCoverImage());
+        }
+        Category updatedCategory = categoryRepository.save(existingCategory);
+        return categoryMapper.CategoryToCategoryDto(updatedCategory);
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+        categoryRepository.delete(category);
+    }
+
 }

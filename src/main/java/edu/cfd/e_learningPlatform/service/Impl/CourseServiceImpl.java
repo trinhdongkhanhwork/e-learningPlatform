@@ -418,4 +418,21 @@ public class CourseServiceImpl implements CourseService {
 
         return courseMapperForLoad.toDto(courseOptional.get());
     }
+
+
+    @Override
+    public List<CourseResponse> getCoursesByCategoryId(Long categoryId) {
+        // Kiểm tra category tồn tại
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + categoryId));
+
+        // Lấy danh sách khóa học theo categoryId
+        List<Course> courses = courseRepository.findByCategoryId(categoryId);
+
+        // Chuyển sang CourseResponse
+        return courses.stream()
+                .map(courseMapper::toCourseResponse)
+                .collect(Collectors.toList());
+    }
+
 }

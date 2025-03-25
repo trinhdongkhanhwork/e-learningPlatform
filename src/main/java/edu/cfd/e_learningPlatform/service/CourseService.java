@@ -1,10 +1,13 @@
 package edu.cfd.e_learningPlatform.service;
 
+import edu.cfd.e_learningPlatform.entity.Course;
 import org.springframework.data.domain.Page;
 
 import edu.cfd.e_learningPlatform.dto.CourseDto;
 import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+
+import java.util.List;
 
 public interface CourseService {
     Page<CourseResponse> getAllCourses(int page, int size);
@@ -18,4 +21,6 @@ public interface CourseService {
     void deleteCourse(Long id);
 
     CourseDto getCourseByIdForLoad(Long id);
+
+    List<CourseResponse> getCoursesByCategoryId(Long categoryId);
 }
