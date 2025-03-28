@@ -2,6 +2,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 
 import edu.cfd.e_learningPlatform.dto.response.FriendResponse;
+import edu.cfd.e_learningPlatform.dto.response.FriendUserResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.Friend;
 import edu.cfd.e_learningPlatform.entity.User;
@@ -20,8 +21,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class FriendServiceImpl implements FriendService {
 
     FriendRepository friendRepository;
@@ -47,6 +48,11 @@ public class FriendServiceImpl implements FriendService {
         } else {
             throw new RuntimeException("Alreadly friends !");
         }
+    }
+
+    @Override
+    public List<UserResponse> getInvitations(String idUser) {
+        return friendRepository.selectInvitation(idUser);
     }
 
     @Override
@@ -78,5 +84,10 @@ public class FriendServiceImpl implements FriendService {
     public List<UserResponse> getFriends(String idUser) {
         List<User> users = friendRepository.selectFriends(idUser);
         return userMapper.toUserResponses(users);
+    }
+
+    @Override
+    public List<FriendUserResponse> searchFriends(String keyword, String idUser) {
+        return friendRepository.findByFullnameContaining(keyword, idUser);
     }
 }

@@ -6,14 +6,12 @@ import edu.cfd.e_learningPlatform.entity.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring")
 public interface MessageMapper {
     MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
-    @Mapping(target = "user.id", source = "userId")
     @Mapping(target = "recall", constant = "false")
     Message messageRequestToMessage(MessageRequest messageRequest);
 

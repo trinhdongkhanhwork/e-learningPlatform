@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +23,8 @@ public class MessageController {
 
     MessageService messageService;
 
-    @PostMapping
+    @MessageMapping("/message/send")
+    @SendTo("/topic/receiveMessage")
     public ResponseEntity<MessageResponse> sendMessage(@RequestBody MessageRequest messageRequest) {
         return ResponseEntity.ok(messageService.sendMessage(messageRequest));
     }
