@@ -1,17 +1,16 @@
 package edu.cfd.e_learningPlatform.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuizDto {
-    private Long id;
-    private String title;
-    private Long lectureId;
-    private List<QuestionDto> questions;
+public class AnswerRequestDTO {
+    private Long quizId;
+    private String userId;
+    private List<UserAnswerDTO> answers;
 }

@@ -38,7 +38,7 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
         PutObjectRequest putRequest =
                 new PutObjectRequest(BUCKET_NAME, fileName, file.getInputStream(), new ObjectMetadata());
         amazonS3.putObject(putRequest);
-        return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName;
+        return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName + UUID.randomUUID();
     }
 
     @Override
