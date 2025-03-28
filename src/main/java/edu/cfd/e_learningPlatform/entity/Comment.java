@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Comments")
+@Table(name = "Comment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,8 +29,6 @@ public class Comment {
 
     private LocalDateTime updatedAt;
 
-    private int star;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -38,10 +36,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "video_id")
     private Video video;
-
-    @ManyToOne
-    @JoinColumn(name = "courses_id")
-    private Course course;
 
     @ManyToOne
     @JsonBackReference

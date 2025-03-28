@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import edu.cfd.e_learningPlatform.entity.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Query(
-            value = "select " + "c.id as id, "
+    @Query(value = "select " + "c.id as id, "
                     + "u.fullname as fullName, "
                     + "u.id as idUserComment, "
                     + "u.avatar_url as profilePicture, "
