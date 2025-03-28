@@ -2,9 +2,11 @@ package edu.cfd.e_learningPlatform.service;
 
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
+import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 
 public interface UserService {
@@ -27,4 +29,6 @@ public interface UserService {
     void deleteUser(String userId);
 
     void updatePassWord(String email, UpdatePassWordRequest request, boolean vail);
+
+    ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request);
 }
