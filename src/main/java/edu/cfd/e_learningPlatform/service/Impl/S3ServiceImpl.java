@@ -35,10 +35,9 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
     @Override
     public String uploadImage(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        PutObjectRequest putRequest =
-                new PutObjectRequest(BUCKET_NAME, fileName, file.getInputStream(), new ObjectMetadata());
+        PutObjectRequest putRequest = new PutObjectRequest(BUCKET_NAME, fileName, file.getInputStream(), new ObjectMetadata());
         amazonS3.putObject(putRequest);
-        return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName + UUID.randomUUID();
+        return "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName;
     }
 
     @Override

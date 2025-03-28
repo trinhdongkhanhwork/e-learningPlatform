@@ -30,7 +30,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     List<FriendUserResponse> findByFullnameContaining(String keyword, String idUser);
 
     @Query("select new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.active, u.roleEntity) " +
-            "from User u left join Friend f on (u = f.user or u = f.friend) and (f.user.id = :idUser OR f.friend.id = :idUser) " +
-            "where f.status = 0 and u.id not like :idUser")
+            "from User u left join Friend f on u = f.user " +
+            "where f.status = 0 and f.friend.id = :idUser")
     List<UserResponse> selectInvitation(String idUser);
 }
