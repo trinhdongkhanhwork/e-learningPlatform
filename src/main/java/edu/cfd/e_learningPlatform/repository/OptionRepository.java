@@ -10,7 +10,6 @@ import edu.cfd.e_learningPlatform.entity.Option;
 
 @Repository
 public interface OptionRepository extends JpaRepository<Option, Long> {
+    List<Option> findByIdIn(List<Long> optionIds);
 
-    @Query("SELECT o FROM Option o WHERE o.question.quiz.id = :quizId AND o.correct = true")
-    List<Option> findCorrectOptionsByQuizId(Long quizId);
 }

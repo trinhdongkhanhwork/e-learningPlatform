@@ -12,18 +12,17 @@ import edu.cfd.e_learningPlatform.mapstruct.LectureMapper;
 import edu.cfd.e_learningPlatform.repository.LectureRepository;
 import edu.cfd.e_learningPlatform.service.AssignmentService;
 import edu.cfd.e_learningPlatform.service.LectureService;
-import edu.cfd.e_learningPlatform.service.QuizService;
 import edu.cfd.e_learningPlatform.service.VideoService;
 
 @Service
 public class LectureServiceImpl implements LectureService {
     private final LectureRepository lectureRepository;
     private final VideoService videoService;
-    private final QuizService quizService;
+    private final QuizServiceImpl quizService;
     private final AssignmentService assignmentService;
     private final LectureMapper lectureMapper = LectureMapper.INSTANCE;
 
-    public LectureServiceImpl(LectureRepository lectureRepository, VideoService videoService, QuizService quizService, AssignmentService assignmentService) {
+    public LectureServiceImpl(LectureRepository lectureRepository, VideoService videoService, QuizServiceImpl quizService, AssignmentService assignmentService) {
         this.lectureRepository = lectureRepository;
         this.videoService = videoService;
         this.quizService = quizService;

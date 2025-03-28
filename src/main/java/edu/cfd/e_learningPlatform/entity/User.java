@@ -68,4 +68,5 @@ public class User {
     private Role roleEntity;
 
     private BigDecimal price;
+
 }

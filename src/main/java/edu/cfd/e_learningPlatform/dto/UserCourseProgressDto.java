@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignmentDto {
+public class UserCourseProgressDto {
     private Long id;
-    private String title;
-    private String description;
-    private String assignmentFileUrl;
-    private LocalDateTime dueDate;
-    private LocalDateTime submittedAt;
-    private Long lectureId;
     private Long userId;
+    private Long courseId;
+    private Long sectionId;
+    private Long lectureId;
+    private String status;
+    private Integer timeSpent;
+    private Integer score;
+    private LocalDateTime progressTimestamp;
 }
