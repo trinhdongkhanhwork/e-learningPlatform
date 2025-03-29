@@ -1,6 +1,5 @@
 package edu.cfd.e_learningPlatform.service;
 
-import edu.cfd.e_learningPlatform.entity.Course;
 import org.springframework.data.domain.Page;
 
 import edu.cfd.e_learningPlatform.dto.CourseDto;
