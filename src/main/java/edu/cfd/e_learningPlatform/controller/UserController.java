@@ -2,6 +2,8 @@ package edu.cfd.e_learningPlatform.controller;
 
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
+import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +97,15 @@ public class UserController {
         userService.updateRoles(userId);
         return ApiResponse.<String>builder()
                 .result("User role updated to INSTRUCTOR")
+                .build();
+    }
+    @PutMapping("/profile/{userId}")
+    public ApiResponse<ProfileUpdateResponse> updateProfile(
+            @PathVariable String userId,
+            @ModelAttribute ProfileUpdateRequest request) {
+        ProfileUpdateResponse updatedProfile = userService.updateProfile(userId, request);
+        return ApiResponse.<ProfileUpdateResponse>builder()
+                .result(updatedProfile)
                 .build();
     }
 }

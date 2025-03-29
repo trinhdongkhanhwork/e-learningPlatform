@@ -17,6 +17,7 @@ public class VNPayConfig {
     public static String vnp_Returnurl = "/api/payments/vnpay/return"; // Đường dẫn trả về phải bao gồm API context
     public static String vnp_TmnCode = "H0EIB7YY"; // Mã thương mại của bạn
     public static String vnp_HashSecret = "PESCCK0961SSFD4MRJ35BKMLJKVMQSCA"; // Khóa bí mật của bạn
+
     // Hàm HMAC SHA-512
     public static String hmacSHA512(final String key, final String data) {
         try {
@@ -36,7 +37,8 @@ public class VNPayConfig {
             throw new RuntimeException("Error in HMAC calculation", ex);
         }
     }
-    // Hàm tạo số ngẫu nhiên
+
+// Hàm tạo số ngẫu nhiên
     public static String getRandomNumber(int len) {
         Random rnd = new Random();
         StringBuilder sb = new StringBuilder(len);

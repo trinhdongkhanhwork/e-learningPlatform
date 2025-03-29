@@ -3,6 +3,8 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
+import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -130,5 +132,41 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
+    }
+    @Override
+    public ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request) {
+        // Tìm user theo ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Cập nhật các trường nếu có dữ liệu từ request
+        if (request.getFullname() != null && !request.getFullname().isEmpty()) {
+            user.setFullname(request.getFullname());
+        }
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            user.setEmail(request.getEmail());
+        } else {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
+            user.setAvatarUrl(request.getAvatarUrl());
+        }
+
+        // Lưu user đã cập nhật
+        User updatedUser = userRepository.save(user);
+
+        // Trả về response
+        return ProfileUpdateResponse.builder()
+                .id(updatedUser.getId())
+                .username(updatedUser.getUsername())
+                .email(updatedUser.getEmail())
+                .fullname(updatedUser.getFullname())
+                .phone(updatedUser.getPhone())
+                .roleEntity(updatedUser.getRoleEntity())
+                .avatarUrl(updatedUser.getAvatarUrl())
+                .build();
     }
 }
