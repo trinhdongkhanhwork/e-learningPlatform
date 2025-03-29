@@ -419,16 +419,6 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.deleteById(id);
     }
 
-    @Override
-    public CourseDto getCourseByIdForLoad(Long courseId) {
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
-        if (courseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Khóa học không tồn tại với ID: " + courseId);
-        }
-
-        return courseMapperForLoad.toDto(courseOptional.get());
-    }
-
 
     @Override
     public List<CourseResponse> getCoursesByCategoryId(Long categoryId) {

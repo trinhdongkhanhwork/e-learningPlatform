@@ -65,9 +65,10 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @GetMapping("/getCourseByIdForLoad/{id}")
-    public ApiResponse<CourseDto> getCourseByIdForLoad(@PathVariable Long id) {
-        CourseDto courseDto = courseService.getCourseByIdForLoad(id);
-        return ApiResponse.<CourseDto>builder().result(courseDto).build();
+
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<CourseResponse>> getCoursesByCategoryId(@PathVariable Long categoryId){
+        List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
+        return ResponseEntity.ok(courses);
     }
 }

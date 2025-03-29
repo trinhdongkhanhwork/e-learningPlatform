@@ -21,7 +21,5 @@ public interface CourseService {
 
     void deleteCourse(Long id);
 
-    CourseDto getCourseByIdForLoad(Long id);
-
     List<CourseResponse> getCoursesByCategoryId(Long categoryId);
 }
