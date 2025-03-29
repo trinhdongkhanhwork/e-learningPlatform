@@ -1,5 +1,6 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
@@ -27,8 +28,7 @@ public class CourseController {
 
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     @PostMapping
-    public ResponseEntity<CourseResponse> createCourse(
-            @Valid @RequestBody CourseCreationRequest courseCreationRequest) {
+    public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseCreationRequest courseCreationRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createCourse(courseCreationRequest));
     }
 
@@ -46,21 +46,29 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAllCourses(page, size));
     }
 
-    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
+    // Cập nhật khóa học, thay đổi trạng thái pendingDelete thay vì xóa
+    @PutMapping("/{id}/pending-delete")
+    public ResponseEntity<Void> markCourseForDeletion(@PathVariable Long id) {
+        courseService.markForDeletion(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Xóa khóa học thực tế khi admin duyệt xóa
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
-        return ResponseEntity.ok(Map.of("message", "Course " + id + " deleted successfully"));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/getCourseById/{id}")
-    public ResponseEntity<CourseResponse> getCourse(@PathVariable Long id) {
+    public ResponseEntity<CourseResponse> getCourse(@PathVariable Long id){
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @GetMapping("/getCourseByIdForLoad/{id}")
-    public ApiResponse<CourseDto> getCourseByIdForLoad(@PathVariable Long id) {
-        CourseDto courseDto = courseService.getCourseByIdForLoad(id);
-        return ApiResponse.<CourseDto>builder().result(courseDto).build();
+
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<CourseResponse>> getCoursesByCategoryId(@PathVariable Long categoryId){
+        List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
+        return ResponseEntity.ok(courses);
     }
 }

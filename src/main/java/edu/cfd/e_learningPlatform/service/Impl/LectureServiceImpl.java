@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.cfd.e_learningPlatform.dto.response.LectueUserResponse;
 import org.springframework.stereotype.Service;
 
 import edu.cfd.e_learningPlatform.dto.LectureDto;
@@ -11,27 +12,32 @@ import edu.cfd.e_learningPlatform.mapstruct.LectureMapper;
 import edu.cfd.e_learningPlatform.repository.LectureRepository;
 import edu.cfd.e_learningPlatform.service.AssignmentService;
 import edu.cfd.e_learningPlatform.service.LectureService;
-import edu.cfd.e_learningPlatform.service.QuizService;
 import edu.cfd.e_learningPlatform.service.VideoService;
 
 @Service
 public class LectureServiceImpl implements LectureService {
-
     private final LectureRepository lectureRepository;
     private final VideoService videoService;
-    private final QuizService quizService;
+    private final QuizServiceImpl quizService;
     private final AssignmentService assignmentService;
     private final LectureMapper lectureMapper = LectureMapper.INSTANCE;
 
-    public LectureServiceImpl(
-            LectureRepository lectureRepository,
-            VideoService videoService,
-            QuizService quizService,
-            AssignmentService assignmentService) {
+    public LectureServiceImpl(LectureRepository lectureRepository, VideoService videoService, QuizServiceImpl quizService, AssignmentService assignmentService) {
         this.lectureRepository = lectureRepository;
         this.videoService = videoService;
         this.quizService = quizService;
         this.assignmentService = assignmentService;
+    }
+
+    @Override
+    public LectueUserResponse getLectureUserById(Long lectureId) {
+        LectueUserResponse lectueUserResponse = lectureMapper.lectureToLectueUserResponse(
+                lectureRepository.findById(lectureId).orElseThrow(() -> new RuntimeException("Not found Lecture"))
+        );
+        lectueUserResponse.setVideoInlectureResponse(videoService.getVideoLecture(lectureId));
+        lectueUserResponse.setQuiz(quizService.findByLectureId(lectureId));
+        lectueUserResponse.setAssignment(assignmentService.findAssignmentInLecture(lectureId));
+        return lectueUserResponse;
     }
 
     @Override

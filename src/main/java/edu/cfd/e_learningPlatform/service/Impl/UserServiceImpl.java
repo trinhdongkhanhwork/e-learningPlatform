@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUser(user, request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         LocalDateTime now = LocalDateTime.now();
-        user.setUpdatedDate(now);
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

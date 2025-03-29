@@ -79,7 +79,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setCommentText(commentRequest.getCommentText());
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
-        comment.setStar(commentRequest.getStar());
         commentRepository.save(comment);
         return commentMapper.commentToCommentVideoResponse(comment);
     }
@@ -113,7 +112,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setId(commentRequest.getId());
         comment.setCommentText(commentRequest.getCommentText());
         comment.setUpdatedAt(LocalDateTime.now());
-        comment.setStar(commentRequest.getStar());
         commentRepository.save(comment);
         return commentMapper.commentToCommentVideoResponse(comment);
     }

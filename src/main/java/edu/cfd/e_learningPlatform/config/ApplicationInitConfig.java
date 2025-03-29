@@ -68,8 +68,6 @@ public class ApplicationInitConfig {
                         .phone("123456789")
                         .roleEntity(adminRole)
                         .avatarUrl("http://example.com/avatar.jpg")
-                        .createdDate(LocalDateTime.now())
-                        .updatedDate(LocalDateTime.now())
                         .active(true)
                         .build();
                 userRepository.save(user);
