@@ -1,16 +1,21 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.service.CourseService;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import edu.cfd.e_learningPlatform.dto.CourseDto;
+import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
+import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.service.CourseService;
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -21,14 +26,23 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    //    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     @PostMapping
     public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseCreationRequest courseCreationRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createCourse(courseCreationRequest));
     }
 
+    @PutMapping("/{courseId}")
+    public ResponseEntity<CourseResponse> updateCourse(
+            @PathVariable Long courseId,
+            @RequestBody CourseCreationRequest courseCreationRequest) {
+        CourseResponse updatedCourse = courseService.updateCourse(courseId, courseCreationRequest);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
     @GetMapping
-    public ResponseEntity<Page<CourseResponse>> getAllCourses(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+    public ResponseEntity<Page<CourseResponse>> getAllCourses(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size) {
         return ResponseEntity.ok(courseService.getAllCourses(page, size));
     }
 
@@ -51,12 +65,10 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @PutMapping("/{courseId}")
-    public ResponseEntity<CourseResponse> updateCourse(
-            @PathVariable Long courseId,
-            @RequestBody CourseCreationRequest courseCreationRequest) {
-        CourseResponse updatedCourse = courseService.updateCourse(courseId, courseCreationRequest);
-        return ResponseEntity.ok(updatedCourse);
-    }
 
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<CourseResponse>> getCoursesByCategoryId(@PathVariable Long categoryId){
+        List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
+        return ResponseEntity.ok(courses);
+    }
 }

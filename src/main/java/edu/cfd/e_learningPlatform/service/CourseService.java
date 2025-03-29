@@ -6,6 +6,8 @@ import edu.cfd.e_learningPlatform.dto.CourseDto;
 import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
 
+import java.util.List;
+
 public interface CourseService {
     Page<CourseResponse> getAllCourses(int page, int size);
 
@@ -19,4 +21,5 @@ public interface CourseService {
 
     void deleteCourse(Long id);
 
+    List<CourseResponse> getCoursesByCategoryId(Long categoryId);
 }
