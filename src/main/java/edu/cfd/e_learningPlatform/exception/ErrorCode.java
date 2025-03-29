@@ -21,7 +21,17 @@ public enum ErrorCode {
     USER_NOT_FOUND(1011, "User not found", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(1012, "Course not found", HttpStatus.NOT_FOUND),
     WISHLIST_NOT_FOUND(1013, "Wishlist not found", HttpStatus.NOT_FOUND),
-    CART_NOT_FOUND(1015,"Cart not found", HttpStatus.NOT_FOUND);
+    CART_NOT_FOUND(1015,"Cart not found", HttpStatus.NOT_FOUND),
+    USER_ROLE_NOT_FOUND(1016,"User role not found", HttpStatus.NOT_FOUND),
+    INSTRUCTOR_NOT_FOUND(1017,"Instructor not found" ,HttpStatus.NOT_FOUND),
+    WALLET_NOT_FOUND(1018, "Admin wallet not found",HttpStatus.NOT_FOUND ),
+    WALLET_BALANCE_NOT_ENOUGH(1019,"Insufficient balance in admin wallet" ,HttpStatus.NOT_FOUND ),
+    INVALID_WITHDRAW_AMOUNT(1020,"Withdraw amount must be greater than 0" ,HttpStatus.BAD_REQUEST ),
+    EMAIL_SENDING_FAILED(1021,"Email sending failed" ,HttpStatus.INTERNAL_SERVER_ERROR ),
+    WITHDRAW_REQUEST_NOT_FOUND(1022,"Withdraw request not found" ,HttpStatus.NOT_FOUND ),
+    OTP_VERIFICATION_FAILED(1023,"OTP verification failed" ,HttpStatus.BAD_REQUEST ),
+    WITHDRAW_NOT_FOUND(1024,"Withdraw not found" ,HttpStatus.NOT_FOUND ),
+    WITHDRAW_ALREADY_PROCESSED(1025, "Withdraw already processed", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
@@ -32,4 +42,5 @@ public enum ErrorCode {
     private final int code;
     private final String message;
     private final HttpStatusCode statusCode;
+
 }

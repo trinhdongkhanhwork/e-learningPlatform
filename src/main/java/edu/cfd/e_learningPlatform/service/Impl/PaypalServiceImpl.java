@@ -7,6 +7,7 @@ import edu.cfd.e_learningPlatform.config.PaypalPaymentIntent;
 import edu.cfd.e_learningPlatform.config.PaypalPaymentMethod;
 import edu.cfd.e_learningPlatform.dto.request.PaymentRequest;
 import edu.cfd.e_learningPlatform.dto.response.PaymentResponseDto;
+import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.PaymentStatus;
 import edu.cfd.e_learningPlatform.entity.User;
@@ -16,6 +17,7 @@ import edu.cfd.e_learningPlatform.repository.PaymentStatusRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.EmailService;
 import edu.cfd.e_learningPlatform.service.PaypalService;
+import edu.cfd.e_learningPlatform.service.WalletService;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class PaypalServiceImpl implements PaypalService {
     CourseRepository courseRepository; // Repository để quản lý khóa học
     UserRepository userRepository; // Repository để quản lý người dùng
     EmailService emailService; // Dịch vụ gửi email
+    WalletService walletService;
 
     // Tạo yêu cầu thanh toán PayPal
     @Override
@@ -278,28 +281,46 @@ public class PaypalServiceImpl implements PaypalService {
     @Override
     public String handlePaymentSuccess(String paymentId, String payerId, String courseIds, String userId, Double price)
             throws PayPalRESTException, MessagingException {
-        Payment paypalPayment = executePayment(paymentId, payerId); // Thực thi thanh toán
-        Long statusId = "approved".equals(paypalPayment.getState()) ? 1L : "failed".equals(paypalPayment.getState()) ? 2L : 3L; // Xác định trạng thái
+        // Thực thi thanh toán qua PayPal
+        Payment paypalPayment = executePayment(paymentId, payerId);
 
+        // Xác định trạng thái thanh toán dựa trên phản hồi từ PayPal
+        Long statusId = "approved".equals(paypalPayment.getState()) ? 1L : "failed".equals(paypalPayment.getState()) ? 2L : 3L;
+
+        // Tìm các bản ghi thanh toán liên quan đến paymentId
         List<edu.cfd.e_learningPlatform.entity.Payment> payments = paymentRepository.findByPaymentId(paymentId);
-        if (payments.isEmpty()) throw new IllegalArgumentException("Không tìm thấy thanh toán cho paymentId: " + paymentId);
+        if (payments.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy thanh toán cho paymentId: " + paymentId);
+        }
 
+        // Lấy trạng thái thanh toán từ repository
         PaymentStatus status = paymentStatusRepository.findById(statusId)
                 .orElseThrow(() -> new IllegalArgumentException("Trạng thái thanh toán không tồn tại: " + statusId));
 
+        // Cập nhật trạng thái cho tất cả các bản ghi thanh toán
         payments.forEach(payment -> {
             payment.setPaymentStatus(status); // Cập nhật trạng thái
-            if (statusId.equals(1L)) payment.setEnrollment(true); // Nếu thành công, bật ghi danh
+            if (statusId.equals(1L)) {
+                payment.setEnrollment(true); // Nếu thành công, bật ghi danh khóa học
+            }
             paymentRepository.save(payment); // Lưu lại
         });
 
+        // Xử lý khi thanh toán thành công
         if (statusId.equals(1L)) { // Nếu thanh toán thành công
             String email = getUserEmailById(userId);
             if (email != null) {
                 emailService.sendPaymentConfirmationEmail(email, paymentId, price); // Gửi email xác nhận
             }
+
+            // Cộng tiền vào ví admin và chia lợi nhuận
+            BigDecimal totalAmount = BigDecimal.valueOf(price);
+            Long courseId = payments.get(0).getCourse().getId(); // Lấy courseId từ payment đầu tiên
+            WalletResponse adminWalletResponse = walletService.depositToAdminWallet(courseId, totalAmount);
+
             return "http://localhost:8081/vue/payment-success"; // Trả về URL thành công cho frontend
         }
-        return null; // Nếu không thành công, trả về null
+
+        return null;
     }
 }

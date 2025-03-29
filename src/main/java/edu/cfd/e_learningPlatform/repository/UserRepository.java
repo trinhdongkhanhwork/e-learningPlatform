@@ -21,5 +21,5 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("Select u.email from User u where u.id = :id")
     String findEmailById(String id);
 
-    Optional<User> findByRoleEntity_Id(int roleId); // Chỉnh sửa phương thức
+    Optional<User> findByRoleEntity_RoleName(String roleName);
 }
