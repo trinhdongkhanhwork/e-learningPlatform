@@ -1,20 +1,21 @@
 package edu.cfd.e_learningPlatform.dto;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class AssignmentDto {
-    private int id;
+    private Long id;
     private String title;
     private String description;
     private String assignmentFileUrl;
-    private Date dueDate;
+    private LocalDateTime dueDate;
+    private LocalDateTime submittedAt;
+    private Long lectureId;
+    private Long userId;
 }

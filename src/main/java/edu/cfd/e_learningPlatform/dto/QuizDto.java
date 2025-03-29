@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class QuizDto {
     private Long id;
     private String title;
+    private Long lectureId;
     private List<QuestionDto> questions;
 }

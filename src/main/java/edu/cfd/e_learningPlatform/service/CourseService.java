@@ -17,6 +17,8 @@ public interface CourseService {
 
     CourseResponse updateCourse(Long id, CourseCreationRequest courseCreationRequest);
 
+    void markForDeletion(Long id);
+
     void deleteCourse(Long id);
 
     CourseDto getCourseByIdForLoad(Long id);

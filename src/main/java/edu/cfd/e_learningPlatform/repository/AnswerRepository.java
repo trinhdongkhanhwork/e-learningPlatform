@@ -5,5 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import edu.cfd.e_learningPlatform.entity.Answer;
 
+import java.util.List;
+
 @Repository
-public interface AnswerRepository extends JpaRepository<Answer, Long> {}
+public interface AnswerRepository extends JpaRepository<Answer, Long> {
+    List<Answer> findByUser_IdAndLecture_Id(String userId, Long lectureId);
+}

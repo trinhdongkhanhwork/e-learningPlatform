@@ -12,4 +12,5 @@ public class VideoDto {
     private String fileName;
     private String duration;
     private String videoUrl;
+    private Long lectureId;
 }

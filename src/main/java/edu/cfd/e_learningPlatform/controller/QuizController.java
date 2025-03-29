@@ -1,34 +1,51 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.util.List;
-
+import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
+import edu.cfd.e_learningPlatform.dto.response.QuizResponse;
+import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+import edu.cfd.e_learningPlatform.entity.Question;
+import edu.cfd.e_learningPlatform.entity.Quiz;
+import edu.cfd.e_learningPlatform.service.Impl.QuizService;
+import edu.cfd.e_learningPlatform.service.Impl.QuizServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.dto.response.QuizResultResponse;
-import edu.cfd.e_learningPlatform.repository.QuizRepository;
-import edu.cfd.e_learningPlatform.service.QuizServiceForGrading;
-import edu.cfd.e_learningPlatform.service.UserCourseProgressService;
-import lombok.RequiredArgsConstructor;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/quiz")
-@RequiredArgsConstructor
+@RequestMapping("/api/quizzes")
 public class QuizController {
-    private final QuizServiceForGrading quizServiceForGrading;
-    private final UserCourseProgressService progressService;
-    private static final int PASS_SCORE = 85;
-    private final QuizRepository quizRepository;
+    @Autowired
+    private QuizServiceImpl quizService;
 
-    @PostMapping("/submit/{quizId}")
-    public ApiResponse<QuizResultResponse> submitQuiz(
-            @PathVariable Long quizId, @RequestParam String userId, @RequestBody List<Long> selectedOptionIds) {
-        int score = quizServiceForGrading.calculateScore(quizId, userId, selectedOptionIds);
-        boolean completed = score >= PASS_SCORE;
+//    @GetMapping("/{quizId}/questions")
+//    public ResponseEntity<List<Question>> getQuizQuestions(@PathVariable Long quizId) {
+//        return quizService.getQuizById(quizId)
+//                .map(quiz -> ResponseEntity.ok(quiz.getQuestions()))
+//                .orElse(ResponseEntity.notFound().build());
+//    }
 
-        return ApiResponse.<QuizResultResponse>builder()
-                .message("Quiz submitted successfully.")
-                .result(new QuizResultResponse(score, completed))
+    @GetMapping
+    ApiResponse<List<QuizResponse>> getQuiz() {
+        return ApiResponse.<List<QuizResponse>>builder()
+                .result(quizService.getQuiz())
                 .build();
+    }
+
+    @GetMapping("/questions/{courseId}/{sectionId}/{lectureId}/{quizId}")
+    public ResponseEntity<List<Quiz>> getQuestions(
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId,
+            @PathVariable Long lectureId,
+            @PathVariable Long quizId
+    ) {
+        List<Quiz> questions = quizService.getQuestionsByQuiz(courseId, sectionId, lectureId, quizId);
+        return questions.isEmpty()
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList())
+                : ResponseEntity.ok(questions);
     }
 }

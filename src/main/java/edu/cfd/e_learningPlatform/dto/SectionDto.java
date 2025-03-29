@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 public class SectionDto {
     private Long id;
     private String title;
+    private Long courseId;
     private List<LectureDto> lectures = new ArrayList<>();
 }
