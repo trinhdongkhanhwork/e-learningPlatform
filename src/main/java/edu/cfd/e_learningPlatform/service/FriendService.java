@@ -8,9 +8,9 @@ import edu.cfd.e_learningPlatform.enums.FriendStatus;
 import java.util.List;
 
 public interface FriendService {
-    FriendResponse sendInvitation(String idUser, String idFriend);
+    UserResponse sendInvitation(String idUser, String idFriend);
     List<UserResponse> getInvitations(String idUser);
-    FriendResponse confirmInvitation(String idUser, String idFriend, FriendStatus status);
+    UserResponse confirmInvitation(String idUser, String idFriend, FriendStatus status);
     String deleteFriend(String idUser, String idFriend);
     List<UserResponse> getFriends(String idUser);
     List<FriendUserResponse> searchFriends(String keyword, String idUser);
