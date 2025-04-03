@@ -424,7 +424,7 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseResponse> getCoursesByCategoryId(Long categoryId) {
         // Kiểm tra category tồn tại
         categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + categoryId));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         // Lấy danh sách khóa học theo categoryId
         List<Course> courses = courseRepository.findByCategoryId(categoryId);

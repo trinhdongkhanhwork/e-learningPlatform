@@ -21,7 +21,11 @@ public enum ErrorCode {
     USER_NOT_FOUND(1011, "User not found", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(1012, "Course not found", HttpStatus.NOT_FOUND),
     WISHLIST_NOT_FOUND(1013, "Wishlist not found", HttpStatus.NOT_FOUND),
-    CART_NOT_FOUND(1015,"Cart not found", HttpStatus.NOT_FOUND);
+    CART_NOT_FOUND(1015,"Cart not found", HttpStatus.NOT_FOUND),
+    CATEGORY_NOT_FOUND(1030,"Category not found" ,HttpStatus.NOT_FOUND ),
+    ENROLLMENT_FALSE(1031,"Enrollment false" ,HttpStatus.NOT_FOUND ),
+    RATING_USER_NOT_FOUND(1031,"Rating and user not found" ,HttpStatus.NOT_FOUND ),
+    RATING_NOT_FOUND(1032,"Rating not found", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
