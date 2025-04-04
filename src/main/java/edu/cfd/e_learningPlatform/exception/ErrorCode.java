@@ -30,8 +30,10 @@ public enum ErrorCode {
     EMAIL_SENDING_FAILED(1021,"Email sending failed" ,HttpStatus.INTERNAL_SERVER_ERROR ),
     WITHDRAW_REQUEST_NOT_FOUND(1022,"Withdraw request not found" ,HttpStatus.NOT_FOUND ),
     OTP_VERIFICATION_FAILED(1023,"OTP verification failed" ,HttpStatus.BAD_REQUEST ),
-    WITHDRAW_NOT_FOUND(1024,"Withdraw not found" ,HttpStatus.NOT_FOUND ),
-    WITHDRAW_ALREADY_PROCESSED(1025, "Withdraw already processed", HttpStatus.BAD_REQUEST);
+    WITHDRAW_NOT_FOUND(1024,"withdraw does not exist or timed out" ,HttpStatus.NOT_FOUND ),
+    WITHDRAW_ALREADY_PROCESSED(1025, "Withdraw already processed", HttpStatus.BAD_REQUEST),
+    TRANSACTION_NOT_FOUND(1026,"Transaction not found", HttpStatus.NOT_FOUND ),
+    OTP_EXPIRED(1027,"OTP expired", HttpStatus.BAD_REQUEST );
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

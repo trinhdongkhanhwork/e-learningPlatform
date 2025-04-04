@@ -11,14 +11,13 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
+@Table(name = "transaction_payment")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "transactions")
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Transactions {
+public class TransactionPayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +37,5 @@ public class Transactions {
     String type;
 
     LocalDateTime createdAt = LocalDateTime.now();
+
 }

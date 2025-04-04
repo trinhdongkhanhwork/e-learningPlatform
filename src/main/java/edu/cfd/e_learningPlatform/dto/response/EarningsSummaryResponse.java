@@ -11,6 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class EarningsSummaryResponse {
 
-    private String userId;
+    private String fullname;
     private BigDecimal totalEarnings;
 }
