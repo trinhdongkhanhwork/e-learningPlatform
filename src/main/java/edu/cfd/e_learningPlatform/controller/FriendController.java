@@ -11,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,15 +25,18 @@ import java.util.List;
 public class FriendController {
 
     FriendService friendService;
+    SimpMessagingTemplate messagingTemplate;
 
-    @PostMapping("/invitation")
-    public ResponseEntity<FriendResponse> sendInvitation(@RequestBody SendInvatitionRequest sendInvatitionRequest){
-        return ResponseEntity.ok(friendService.sendInvitation(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend()));
+    @MessageMapping("/friend/invitation")
+    public void sendInvitation(@Payload SendInvatitionRequest sendInvatitionRequest){
+        UserResponse response = friendService.sendInvitation(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend());
+        messagingTemplate.convertAndSend("/friend/" + sendInvatitionRequest.getIdFriend() + "/private", response);
     }
 
-    @PutMapping("/{status}")
-    public ResponseEntity<FriendResponse> acceptInvitation(@PathVariable FriendStatus status, @RequestBody SendInvatitionRequest sendInvatitionRequest){
-        return ResponseEntity.ok(friendService.confirmInvitation(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend(), status));
+    @MessageMapping("/friend/confirm")
+    public void acceptInvitation(@RequestBody SendInvatitionRequest sendInvatitionRequest){
+        UserResponse response = friendService.confirmInvitation(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend(), FriendStatus.FRIEND);
+        messagingTemplate.convertAndSend("/friend/" + sendInvatitionRequest.getIdFriend() + "/confirm/private", response);
     }
 
     @GetMapping("/invitation/{idUser}")

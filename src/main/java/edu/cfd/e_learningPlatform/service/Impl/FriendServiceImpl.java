@@ -31,11 +31,12 @@ public class FriendServiceImpl implements FriendService {
     UserMapper userMapper;
 
     @Override
-    public FriendResponse sendInvitation(String idUser, String idFriend) {
+    public UserResponse sendInvitation(String idUser, String idFriend) {
         Friend friend = friendRepository.existFriend(idUser, idFriend);
+        User user = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("User not found !"));
         if (friend == null && !idUser.equals(idFriend)) {
             friend = new Friend();
-            friend.setUser(userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("User not found !")));
+            friend.setUser(user);
             friend.setFriend(userRepository.findById(idFriend).orElseThrow(() -> new RuntimeException("Friend not found !")));
             friend.setCreatedAt(LocalDateTime.now());
             friend.setStatus(FriendStatus.INVITATION);
@@ -44,7 +45,8 @@ public class FriendServiceImpl implements FriendService {
             } catch (Exception e) {
                 throw new RuntimeException("Error invitation friend: " + e.getMessage());
             }
-            return friendMapper.friendToFriendResponse(friend);
+            friendMapper.friendToFriendResponse(friend);
+            return userMapper.toUserResponse(user);
         } else {
             throw new RuntimeException("Alreadly friends !");
         }
@@ -56,13 +58,14 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public FriendResponse confirmInvitation(String idUser, String idFriend, FriendStatus status) {
+    public UserResponse confirmInvitation(String idUser, String idFriend, FriendStatus status) {
         Friend friend = friendRepository.existFriend(idUser, idFriend);
+        User user = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("User not found !"));
         if (friend == null && !idUser.equals(idFriend)) throw new RuntimeException("Friend not found !");
         friend.setStatus(status);
         try {
-           friend = friendRepository.save(friend);
-           return friendMapper.friendToFriendResponse(friend);
+           friendRepository.save(friend);
+           return userMapper.toUserResponse(user);
         } catch (Exception e) {
             throw new RuntimeException("Error updating friend: " + e.getMessage());
         }
