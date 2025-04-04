@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.response.WithdrawResponse;
+import edu.cfd.e_learningPlatform.dto.response.WithdrawTransactionResponse;
 import edu.cfd.e_learningPlatform.entity.Transactions;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.entity.Wallet;
@@ -20,11 +21,14 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -67,13 +71,14 @@ public class WithdrawServiceImpl implements WithdrawService {
         // Tạo OTP
         String otp = emailService.generateOTP(user.getEmail());
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime otpExpirationTime = now.plusMinutes(2); // OTP hết hạn sau 2 phút
+        LocalDateTime otpExpirationTime = now.plusMinutes(2);
 
         // Lưu thông tin rút tiền vào bảng Withdraws với trạng thái PENDING và OTP
         Withdraw withdraw = new Withdraw();
         withdraw.setUser(user);
         withdraw.setPrice(amount);
         withdraw.setRequestDate(now);
+        withdraw.setFullname(user.getFullname());
         withdraw.setStatus(WithdrawStatus.PENDING);
         withdraw.setOtp(passwordEncoder.encode(otp));
         withdraw.setOtpCreationTime(now);
@@ -87,7 +92,7 @@ public class WithdrawServiceImpl implements WithdrawService {
             throw new AppException(ErrorCode.EMAIL_SENDING_FAILED);
         }
 
-        // Trả về WithdrawResponse thay vì WalletResponse
+        // Trả về WithdrawResponse
         WithdrawResponse response = new WithdrawResponse();
         response.setWithdrawId(withdraw.getId());
         response.setUserId(userId);
@@ -108,13 +113,19 @@ public class WithdrawServiceImpl implements WithdrawService {
                 .orElseThrow(() -> new AppException(ErrorCode.WITHDRAW_NOT_FOUND));
 
         // Kiểm tra xem yêu cầu rút tiền thuộc về user không
-        if (!withdraw.getUser().getId().equals(userId)) {
+        if (!withdraw.getUser ().getId().equals(userId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         // Kiểm tra trạng thái yêu cầu
         if (!withdraw.getStatus().equals(WithdrawStatus.PENDING)) {
             throw new AppException(ErrorCode.WITHDRAW_ALREADY_PROCESSED);
+        }
+
+        // Kiểm tra thời gian hết hạn của OTP
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(withdraw.getOtpExpirationTime())) {
+            throw new AppException(ErrorCode.OTP_EXPIRED);
         }
 
         // Xác minh OTP
@@ -127,7 +138,7 @@ public class WithdrawServiceImpl implements WithdrawService {
         // Lấy ví admin
         User admin = userRepository.findByRoleEntity_RoleName("ADMIN")
                 .orElseThrow(() -> new AppException(ErrorCode.USER_ROLE_NOT_FOUND));
-        Wallet adminWallet = walletRespository.findByUser(admin)
+        Wallet adminWallet = walletRespository.findByUser (admin)
                 .orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_FOUND));
 
         BigDecimal amount = withdraw.getPrice();
@@ -139,18 +150,22 @@ public class WithdrawServiceImpl implements WithdrawService {
 
         // Ghi giao dịch rút cho admin
         Transactions adminTransaction = new Transactions();
-        adminTransaction.setUser(admin);
+        adminTransaction.setUser (admin);
         adminTransaction.setAmount(amount.negate());
+        adminTransaction.setFullname(user.getFullname());
         adminTransaction.setType("WITHDRAW");
+        adminTransaction.setStatus(WithdrawStatus.COMPLETED);
         adminTransaction.setCreatedAt(LocalDateTime.now());
         transactionRespository.save(adminTransaction);
 
         // Ghi giao dịch rút cho user
         String transactionType = "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()) ? "EARNING_WITHDRAWN" : "ADMIN_WITHDRAWN";
         Transactions userTransaction = new Transactions();
-        userTransaction.setUser(user);
+        userTransaction.setUser (user);
         userTransaction.setAmount(amount);
         userTransaction.setType(transactionType);
+        userTransaction.setFullname(user.getFullname());
+        userTransaction.setStatus(WithdrawStatus.COMPLETED);
         userTransaction.setCreatedAt(LocalDateTime.now());
         transactionRespository.save(userTransaction);
 
@@ -179,5 +194,35 @@ public class WithdrawServiceImpl implements WithdrawService {
         response.setRequestDate(withdraw.getRequestDate());
         response.setStatus(WithdrawStatus.COMPLETED.name());
         return response;
+    }
+
+    @Scheduled(fixedRate = 60000) // Runs every minute
+    public void autoDeleteExpiredWithdrawals() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Withdraw> expiredWithdrawals = withdrawRepository.findByStatusAndOtpExpirationTimeBefore(WithdrawStatus.PENDING, now);
+        if (!expiredWithdrawals.isEmpty()) {
+            withdrawRepository.deleteAll(expiredWithdrawals);
+        }
+    }
+
+    @Override
+    public List<WithdrawTransactionResponse> getUserWithdrawalHistory(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Lấy danh sách yêu cầu rút tiền của người dùng
+        List<Withdraw> withdrawals = withdrawRepository.findByUser(user);
+
+        return withdrawals.stream()
+                .map(withdraw -> new WithdrawTransactionResponse(
+                        withdraw.getId(),
+                        withdraw.getPrice(),
+                        withdraw.getRequestDate(),
+                        withdraw.getStatus().name(),
+                        withdraw.getUser ().getEmail(),
+                        withdraw.getStatus(),
+                        withdraw.getFullname()
+                ))
+                .collect(Collectors.toList());
     }
 }

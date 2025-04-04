@@ -24,6 +24,8 @@ public class Withdraw {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private String fullname;
+
     private BigDecimal price;
     private LocalDateTime requestDate = LocalDateTime.now();
     private String otp;

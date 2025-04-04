@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.response.EarningsSummaryResponse;
+import edu.cfd.e_learningPlatform.dto.response.WithdrawTransactionResponse;
 import edu.cfd.e_learningPlatform.service.TransactionsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/transactions")
@@ -24,4 +27,11 @@ public class TransactionsController {
         EarningsSummaryResponse summary = transactionsService.getEarningsSummary(id);
         return ResponseEntity.ok(summary);
     }
+
+    @GetMapping("/withdrawlTransaction")
+    public ResponseEntity<List<WithdrawTransactionResponse>> getAllWithdrawls(){
+        List<WithdrawTransactionResponse> withdrawls = transactionsService.getAllWithdrawals();
+        return ResponseEntity.ok(withdrawls);
+    }
+
 }

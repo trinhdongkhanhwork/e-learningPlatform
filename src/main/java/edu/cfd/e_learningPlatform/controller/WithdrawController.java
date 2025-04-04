@@ -4,6 +4,7 @@ import edu.cfd.e_learningPlatform.dto.request.ConfirmWithdrawRequest;
 import edu.cfd.e_learningPlatform.dto.request.WalletRequest;
 import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
 import edu.cfd.e_learningPlatform.dto.response.WithdrawResponse;
+import edu.cfd.e_learningPlatform.dto.response.WithdrawTransactionResponse;
 import edu.cfd.e_learningPlatform.service.WalletService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -13,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import edu.cfd.e_learningPlatform.service.WithdrawService;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/withdraw")
 @RequiredArgsConstructor
@@ -36,5 +40,11 @@ public class WithdrawController {
                 request.getWithdrawId()
         );
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/withdrawal-history/{userId}")
+    public ResponseEntity<List<WithdrawTransactionResponse>> getUserWithdrawalHistory(@PathVariable String userId) {
+        List<WithdrawTransactionResponse> history = withdrawService.getUserWithdrawalHistory(userId);
+        return ResponseEntity.ok(history);
     }
 }

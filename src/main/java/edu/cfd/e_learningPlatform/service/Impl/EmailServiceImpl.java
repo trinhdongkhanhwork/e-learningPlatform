@@ -140,6 +140,9 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendWithdrawConfirmationEmail(String email, String fullname, BigDecimal amount, LocalDateTime requestDate, WithdrawStatus status) throws MessagingException {
         String subject = "WithDraw request confirmation";
+
+        String formattedAmount = amount.stripTrailingZeros().toPlainString();
+
         String htmlContent = String.format(
                 "<html><body>" +
                         "<h1>Withdraw Request Confirmation</h1>" +
@@ -153,7 +156,7 @@ public class EmailServiceImpl implements EmailService {
                         "<p>We will process your request soon. Thank you!</p>" +
                         "</body></html>",
                 fullname,
-                amount.toString(),
+                formattedAmount,
                 requestDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 status.name()
         );
