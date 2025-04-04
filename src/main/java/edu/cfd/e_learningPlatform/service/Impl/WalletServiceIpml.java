@@ -1,15 +1,11 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
-import edu.cfd.e_learningPlatform.dto.response.WithdrawResponse;
 import edu.cfd.e_learningPlatform.entity.*;
-import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import edu.cfd.e_learningPlatform.mapstruct.WalletMapper;
 import edu.cfd.e_learningPlatform.repository.*;
-import edu.cfd.e_learningPlatform.service.EmailService;
-import edu.cfd.e_learningPlatform.service.TransactionsService;
 import edu.cfd.e_learningPlatform.service.WalletService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
