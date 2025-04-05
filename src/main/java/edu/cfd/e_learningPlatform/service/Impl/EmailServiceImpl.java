@@ -51,10 +51,31 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(email);
-        helper.setSubject("OTP Confirmation");
-        helper.setText("Your OTP code is: " + otp, true);
+        helper.setSubject("Your OTP Code");
+
+        String htmlContent = String.format(
+                "<html>" +
+                        "<body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>" +
+                        "<div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>" +
+                        "<h2 style='color: #4CAF50;'>OTP Verification</h2>" +
+                        "<p>Hello,</p>" +
+                        "<p>We received a request to verify your identity. Please use the OTP code below to proceed:</p>" +
+                        "<div style='text-align: center; margin: 30px 0;'>" +
+                        "  <span style='font-size: 28px; font-weight: bold; color: #ffffff; background-color: #4CAF50; padding: 15px 30px; border-radius: 8px;'>%s</span>" +
+                        "</div>" +
+                        "<p>This OTP is valid for a limited time. If you did not request this, please ignore this email.</p>" +
+                        "<p>Thank you!</p>" +
+                        "<p style='color: #888888; font-size: 12px;'>This is an automated message, please do not reply.</p>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>",
+                otp
+        );
+
+        helper.setText(htmlContent, true);
         mailSender.send(message);
     }
+
 
     @Override
     public boolean verifyOTP(String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime) {
@@ -139,27 +160,35 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendWithdrawConfirmationEmail(String email, String fullname, BigDecimal amount, LocalDateTime requestDate, WithdrawStatus status) throws MessagingException {
-        String subject = "WithDraw request confirmation";
+        String subject = "Withdraw Request Confirmation";
 
         String formattedAmount = amount.stripTrailingZeros().toPlainString();
 
         String htmlContent = String.format(
-                "<html><body>" +
-                        "<h1>Withdraw Request Confirmation</h1>" +
-                        "<p>Hello %s,</p>" +
-                        "<p>Your withdraw request has been submitted successfully.</p>" +
-                        "<ul>" +
-                        "<li><strong>Amount:</strong> %s USD</li>" +
-                        "<li><strong>Request Date:</strong> %s</li>" +
-                        "<li><strong>Status:</strong> %s</li>" +
-                        "</ul>" +
-                        "<p>We will process your request soon. Thank you!</p>" +
-                        "</body></html>",
+                "<html>" +
+                        "<body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>" +
+                        "<div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>" +
+                        "<h2 style='color: #4CAF50;'>Withdraw Request Confirmation</h2>" +
+                        "<p>Dear <strong>%s</strong>,</p>" +
+                        "<p>Your withdraw request has been <strong>submitted successfully</strong>. Here are the details:</p>" +
+                        "<table style='width: 100%%; border-collapse: collapse; margin-top: 20px;'>"+
+                        "  <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>Amount:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>%s USD</td></tr>" +
+                        "  <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>Request Date:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>%s</td></tr>" +
+                        "  <tr><td style='padding: 8px;'><strong>Status:</strong></td><td style='padding: 8px;'>%s</td></tr>" +
+                        "</table>" +
+                        "<p style='margin-top: 20px;'>We are currently processing your request. You will receive another email once the process is complete.</p>" +
+                        "<p>Thank you for using our service!</p>" +
+                        "<p style='color: #888888; font-size: 12px;'>This is an automated message. Please do not reply to this email.</p>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>",
                 fullname,
                 formattedAmount,
                 requestDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 status.name()
         );
+
         sendEmail(email, subject, htmlContent);
     }
+
 }

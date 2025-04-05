@@ -24,31 +24,41 @@ public class TransactionsController {
 
     TransactionsService transactionsService;
 
+    //Lịch sử rút tiền user
     @GetMapping("/user/{id}/earnings-summary")
     public ResponseEntity<EarningsSummaryResponse> getEarningsSummary(@PathVariable String id){
         EarningsSummaryResponse summary = transactionsService.getEarningsSummary(id);
         return ResponseEntity.ok(summary);
     }
 
+    //Tất cả lịch sử rút tiền
     @GetMapping("/withdrawlTransaction")
     public ResponseEntity<List<WithdrawTransactionResponse>> getAllWithdrawls(){
         List<WithdrawTransactionResponse> withdrawls = transactionsService.getAllWithdrawals();
         return ResponseEntity.ok(withdrawls);
     }
 
+    //thống kê withdraw user
     @GetMapping("/withdrawl-summary/{userId}")
     public ResponseEntity<Map<String, List<WithdrawlSummaryResponse>>> getWithdrawlSummary(@PathVariable String userId){
         Map<String, List<WithdrawlSummaryResponse>> summary = transactionsService.getWithdrawalSummary(userId);
         return ResponseEntity.ok(summary);
     }
 
+    @GetMapping("/withdrawl-summary-payment/{userId}")
+    public ResponseEntity<Map<String, List<WithdrawlSummaryResponse>>> getWithdrawSummaryPayment(@PathVariable String userId){
+        Map<String, List<WithdrawlSummaryResponse>> summaryPayment = transactionsService.getWithdrawSummaryPayment(userId);
+        return ResponseEntity.ok(summaryPayment);
+    }
+
+    //thống kê transaction withdraw admin
     @GetMapping("/summary/{timeFrame}")
     public ResponseEntity<List<WithdrawlSummaryResponse>> getAllTransactionsSummary(@PathVariable String timeFrame) {
         List<WithdrawlSummaryResponse> summary = transactionsService.summarizeAllTransactions(timeFrame);
         return ResponseEntity.ok(summary);
     }
 
-    //Thống kê transaction payment
+    //Thống kê transaction payment admin
     @GetMapping("/summaryPayment/{timeFrame}")
     public ResponseEntity<List<WithdrawlSummaryResponse>> getAllTransactionsSummaryPayment(@PathVariable String timeFrame) {
         List<WithdrawlSummaryResponse> summary = transactionsService.summarizwAllTransactionPayments(timeFrame);
