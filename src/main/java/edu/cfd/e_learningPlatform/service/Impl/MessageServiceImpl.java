@@ -1,11 +1,13 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.request.MessageRequest;
+import edu.cfd.e_learningPlatform.dto.response.MessageFriendResponse;
 import edu.cfd.e_learningPlatform.dto.response.MessageResponse;
 import edu.cfd.e_learningPlatform.entity.Friend;
 import edu.cfd.e_learningPlatform.entity.Message;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.enums.FriendStatus;
+import edu.cfd.e_learningPlatform.mapstruct.FriendMapper;
 import edu.cfd.e_learningPlatform.mapstruct.MessageMapper;
 import edu.cfd.e_learningPlatform.repository.FriendRepository;
 import edu.cfd.e_learningPlatform.repository.MessageRepository;
@@ -27,6 +29,7 @@ public class MessageServiceImpl implements MessageService {
     MessageRepository messageRepository;
     MessageMapper messageMapper;
     FriendRepository friendRepository;
+    FriendMapper friendMapper;
     UserRepository userRepository;
 
     @Override
@@ -48,13 +51,11 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageResponse> getMessageFriend(String idUser, String idFriend) {
+    public MessageFriendResponse getMessageFriend(String idUser, String idFriend) {
         Friend friend = friendRepository.existFriend(idUser, idFriend);
         if (friend == null || idUser.equals(idFriend)) throw new RuntimeException("Friend not found !");
         if(friend.getStatus() != FriendStatus.FRIEND) throw new RuntimeException("Friend is not friend !");
         List<Message> messages = messageRepository.findMessagesByFriendId(friend.getId());
-        return messageMapper.messagesToMessageResponses(messages);
+        return new MessageFriendResponse(friendMapper.friendToFriendResponse(friend), messageMapper.messagesToMessageResponses(messages));
     }
-
-
 }

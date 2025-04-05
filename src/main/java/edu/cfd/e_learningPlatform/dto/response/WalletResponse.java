@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class WalletResponse {
-
     private Long walletId;
     private String userId;
     private String fullname;

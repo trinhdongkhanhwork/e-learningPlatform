@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.request.MessageRequest;
 import edu.cfd.e_learningPlatform.dto.request.SendInvatitionRequest;
+import edu.cfd.e_learningPlatform.dto.response.MessageFriendResponse;
 import edu.cfd.e_learningPlatform.dto.response.MessageResponse;
 import edu.cfd.e_learningPlatform.service.MessageService;
 import lombok.AccessLevel;
@@ -29,22 +30,12 @@ public class MessageController {
 
     @MessageMapping("/message/send")
     public void sendMessage(@Payload MessageRequest messageRequest) {
-        String userId = messageRequest.getUserId();
-        String friendId = messageRequest.getFriendId();
-        if (userId == null || userId.isEmpty()) {
-            throw new RuntimeException("Người gửi hợp lệ");
-        }
-
-        if (friendId == null || friendId.isEmpty()) {
-            throw new RuntimeException("Nguời nhận không hợp lệ");
-        }
         MessageResponse response = messageService.sendMessage(messageRequest);
-        messagingTemplate.convertAndSend("/message/" + friendId + "/private", response);
-        messagingTemplate.convertAndSend("/message/" + userId + "/private", response);
+        messagingTemplate.convertAndSend("/message/" + response.getFriendId() + "/private", response);
     }
 
     @PostMapping("/get")
-    public ResponseEntity<List<MessageResponse>> getMessagesFriend(@RequestBody SendInvatitionRequest sendInvatitionRequest) {
+    public ResponseEntity<MessageFriendResponse> getMessagesFriend(@RequestBody SendInvatitionRequest sendInvatitionRequest) {
         return ResponseEntity.ok(messageService.getMessageFriend(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend()));
     }
 }
