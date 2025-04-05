@@ -33,7 +33,11 @@ public enum ErrorCode {
     WITHDRAW_NOT_FOUND(1024,"withdraw does not exist or timed out" ,HttpStatus.NOT_FOUND ),
     WITHDRAW_ALREADY_PROCESSED(1025, "Withdraw already processed", HttpStatus.BAD_REQUEST),
     TRANSACTION_NOT_FOUND(1026,"Transaction not found", HttpStatus.NOT_FOUND ),
-    OTP_EXPIRED(1027,"OTP expired", HttpStatus.BAD_REQUEST );
+    OTP_EXPIRED(1027,"OTP expired", HttpStatus.BAD_REQUEST ),
+    CATEGORY_NOT_FOUND(1030,"Category not found" ,HttpStatus.NOT_FOUND ),
+    ENROLLMENT_FALSE(1031,"Enrollment false" ,HttpStatus.NOT_FOUND ),
+    RATING_USER_NOT_FOUND(1031,"Rating and user not found" ,HttpStatus.NOT_FOUND ),
+    RATING_NOT_FOUND(1032,"Rating not found", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
@@ -44,5 +48,4 @@ public enum ErrorCode {
     private final int code;
     private final String message;
     private final HttpStatusCode statusCode;
-
 }

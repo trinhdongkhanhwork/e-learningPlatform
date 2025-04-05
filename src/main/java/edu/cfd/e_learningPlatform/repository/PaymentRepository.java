@@ -32,7 +32,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findAllByPaymentStatusId(long l);
 
-    List<Payment> findByUserIdAndCourseIdAndPaymentStatusId(String userId, Long courseId, Long paymentStatusId);
-
     List<Payment> findByUserIdAndCourseId(String userId, Long courseId);
+
+    boolean existsByUserIdAndCourseIdAndEnrollment(String userId, Long courseId, Boolean enrollment);
 }
