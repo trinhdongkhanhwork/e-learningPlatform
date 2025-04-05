@@ -42,10 +42,6 @@ public class Comment {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @OneToMany(mappedBy = "comment")
-    @JsonManagedReference
-    private List<Comment> comments;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.cfd.e_learningPlatform.mapstruct.UserMapper;
 import org.springframework.stereotype.Service;
 
 import edu.cfd.e_learningPlatform.dto.request.CommentRequest;
@@ -27,25 +28,26 @@ public class CommentServiceImpl implements CommentService {
 
     CommentRepository commentRepository;
     CommentMapper commentMapper;
+    UserMapper userMapper;
     VideoRepository videoReponsitory;
     private final UserRepository userRepository;
 
     @Override
     public List<CommentVideoResponse> getCommentVideo(Long idVideo) {
-        List<Object[]> resutls = commentRepository.getCommentVideo(idVideo);
-        if (resutls == null) {
+        List<Comment> comments = commentRepository.findByVideo(idVideo);
+        if (comments == null) {
             return null;
         }
-        List<CommentVideoResponse> commentVideoResponses = resutls.stream()
-                .map(result -> new CommentVideoResponse(
-                        (Long) result[0], // id
-                        (String) result[1], // fullName
-                        (String) result[2], // idUserComment
-                        (String) result[3], // profilePicture
-                        (String) result[4], // commentText
-                        (String) result[5], // nameUserParent
-                        (Long) result[6] // parentId
-                        ))
+        List<CommentVideoResponse> commentVideoResponses = comments.stream()
+                .map(comment -> new CommentVideoResponse(
+                        comment.getId(),
+                        comment.getUser().getFullname(),
+                        comment.getUser().getAvatarUrl(),
+                        comment.getCommentText(),
+                        comment.getCreatedAt(),
+                        comment.getComment() != null ? comment.getComment().getId() : null,
+                        comment.getComment() != null ? comment.getComment().getUser().getFullname() : null
+                ))
                 .collect(Collectors.toList());
         return commentVideoResponses;
     }
@@ -53,6 +55,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentVideoResponse addComment(CommentRequest commentRequest) {
         Comment comment = new Comment();
+        User parent = null;
         if (commentRequest.getUserId() != null) {
             User user = userRepository
                     .findById(commentRequest.getUserId())
@@ -66,6 +69,7 @@ public class CommentServiceImpl implements CommentService {
             Comment commentParent =
                     commentRepository.findById(commentRequest.getParentId()).orElse(null);
             comment.setComment(commentParent);
+            parent = commentParent.getUser();
         } else {
             comment.setComment(null);
         }
@@ -80,7 +84,18 @@ public class CommentServiceImpl implements CommentService {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
         commentRepository.save(comment);
-        return commentMapper.commentToCommentVideoResponse(comment);
+
+
+        CommentVideoResponse commentVideoResponse = new CommentVideoResponse(
+                comment.getId(),
+                comment.getUser().getFullname(),
+                comment.getUser().getAvatarUrl(),
+                comment.getCommentText(),
+                comment.getCreatedAt(),
+                comment.getComment() != null ? comment.getComment().getId() : null,
+                comment.getComment() != null ? comment.getComment().getUser().getFullname() : null
+        );
+        return commentVideoResponse;
     }
 
     @Override
@@ -113,7 +128,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setCommentText(commentRequest.getCommentText());
         comment.setUpdatedAt(LocalDateTime.now());
         commentRepository.save(comment);
-        return commentMapper.commentToCommentVideoResponse(comment);
+        return null;
     }
 
     @Override
