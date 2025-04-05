@@ -1,7 +1,6 @@
-package edu.cfd.e_learningPlatform.entity;
+package edu.cfd.e_learningPlatform.dto.response;
 
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,31 +10,17 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "transactions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Transactions {
+public class WithdrawTransactionResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    User user;
-
-    String fullname;
-
-    WithdrawStatus status;
-
-    @Column(nullable = false)
     BigDecimal amount;
-
+    LocalDateTime createdAt;
     String type;
-
-    LocalDateTime createdAt = LocalDateTime.now();
+    String email;
+    WithdrawStatus status;
+    String fullname;
 }

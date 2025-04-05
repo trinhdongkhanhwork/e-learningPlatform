@@ -25,7 +25,7 @@ public class WalletServiceIpml implements WalletService {
     WalletRespository walletRespository;
     UserRepository userRepository;
     CourseRepository courseRepository;
-    TransactionRespository transactionRespository;
+    TransactionPaymentRepository transactionRespository;
     WalletMapper walletMapper;
 
     static final BigDecimal ADMIN_SHARE = new BigDecimal("0.20");
@@ -56,10 +56,11 @@ public class WalletServiceIpml implements WalletService {
         // Tính lợi nhuận của admin (20%)
         BigDecimal adminProfit = amount.multiply(ADMIN_SHARE);
         // Ghi giao dịch cho admin
-        Transactions adminTransaction = new Transactions();
+        TransactionPayment adminTransaction = new TransactionPayment();
         adminTransaction.setUser(admin);
         adminTransaction.setAmount(adminProfit);
         adminTransaction.setType("ADMIN_PROFIT");
+        adminTransaction.setFullname(admin.getFullname());
         adminTransaction.setCreatedAt(LocalDateTime.now());
         transactionRespository.save(adminTransaction);
 
@@ -71,10 +72,11 @@ public class WalletServiceIpml implements WalletService {
         // Tính lợi nhuận của instructor (80%)
         BigDecimal instructorProfit = amount.multiply(INSTRUCTOR_SHARE);
         // Ghi giao dịch cho instructor
-        Transactions instructorTransaction = new Transactions();
+        TransactionPayment instructorTransaction = new TransactionPayment();
         instructorTransaction.setUser(instructor);
         instructorTransaction.setAmount(instructorProfit);
         instructorTransaction.setType("EARNING_PENDING");
+        instructorTransaction.setFullname(instructor.getFullname());
         instructorTransaction.setCreatedAt(LocalDateTime.now());
         transactionRespository.save(instructorTransaction);
 
@@ -90,7 +92,7 @@ public class WalletServiceIpml implements WalletService {
                     Wallet newWallet = new Wallet();
                     newWallet.setUser(user);
                     newWallet.setRoleEntity(user.getRoleEntity());
-                    newWallet.setBalance(BigDecimal.ZERO); //  số dư thực tế của admin
+                    newWallet.setBalance(BigDecimal.ZERO);
                     newWallet.setUpdateAt(LocalDateTime.now());
                     return walletRespository.save(newWallet);
                 });

@@ -13,6 +13,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRespository extends JpaRepository<Transactions,Long> {
-    List<Transactions> findByUser(User user);
-    List<Transactions> findByUserAndType(User user, String type);
+    List<Transactions> findByTypeIn(List<String> types);
+    List<Transactions> findByUserAndTypeIn(User user, List<String> types);
+
 }
