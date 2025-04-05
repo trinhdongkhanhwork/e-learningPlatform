@@ -45,6 +45,7 @@ public class TransactionsController {
         return ResponseEntity.ok(summary);
     }
 
+    // thống kê tiền vào user
     @GetMapping("/withdrawl-summary-payment/{userId}")
     public ResponseEntity<Map<String, List<WithdrawlSummaryResponse>>> getWithdrawSummaryPayment(@PathVariable String userId){
         Map<String, List<WithdrawlSummaryResponse>> summaryPayment = transactionsService.getWithdrawSummaryPayment(userId);
