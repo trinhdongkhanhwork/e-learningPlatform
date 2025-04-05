@@ -148,16 +148,6 @@ public class WithdrawServiceImpl implements WithdrawService {
         adminWallet.setUpdateAt(LocalDateTime.now());
         walletRespository.save(adminWallet);
 
-        // Ghi giao dịch rút cho admin
-        Transactions adminTransaction = new Transactions();
-        adminTransaction.setUser (admin);
-        adminTransaction.setAmount(amount.negate());
-        adminTransaction.setFullname(user.getFullname());
-        adminTransaction.setType("WITHDRAW");
-        adminTransaction.setStatus(WithdrawStatus.COMPLETED);
-        adminTransaction.setCreatedAt(LocalDateTime.now());
-        transactionRespository.save(adminTransaction);
-
         // Ghi giao dịch rút cho user
         String transactionType = "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()) ? "EARNING_WITHDRAWN" : "ADMIN_WITHDRAWN";
         Transactions userTransaction = new Transactions();
