@@ -2,6 +2,8 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.exception.AppException;
+import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return categoryMapper.CategoryToCategoryDto(category);
     }
 
@@ -54,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(Long id, CategoryDto categoryDto) {
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         existingCategory.setCategoryName(categoryDto.getCategoryName());
         if (categoryDto.getCoverImage() != null) {
             existingCategory.setCoverImage(categoryDto.getCoverImage());
@@ -66,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy category với ID: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         categoryRepository.delete(category);
     }
 

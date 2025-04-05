@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
     public ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request) {
         // Tìm user theo ID
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         // Cập nhật các trường nếu có dữ liệu từ request
         if (request.getFullname() != null && !request.getFullname().isEmpty()) {
