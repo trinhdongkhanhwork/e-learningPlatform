@@ -48,4 +48,10 @@ public class TransactionsController {
         return ResponseEntity.ok(summary);
     }
 
+    @GetMapping("/summaryPayment/{timeFrame}")
+    public ResponseEntity<List<WithdrawlSummaryResponse>> getAllTransactionsSummaryPayment(@PathVariable String timeFrame) {
+        List<WithdrawlSummaryResponse> summary = transactionsService.summarizwAllTransactionPayments(timeFrame);
+        return ResponseEntity.ok(summary);
+    }
+
 }
