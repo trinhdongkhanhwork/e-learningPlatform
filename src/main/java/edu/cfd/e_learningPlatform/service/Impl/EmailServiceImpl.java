@@ -2,6 +2,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
 import edu.cfd.e_learningPlatform.entity.Course;
+import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
@@ -18,8 +19,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 
@@ -132,5 +135,31 @@ public class EmailServiceImpl implements EmailService {
                         "</body></html>", paymentId, price
         );
         sendEmail(email, "Payment Confirmation", htmlContent);
+    }
+
+    @Override
+    public void sendWithdrawConfirmationEmail(String email, String fullname, BigDecimal amount, LocalDateTime requestDate, WithdrawStatus status) throws MessagingException {
+        String subject = "WithDraw request confirmation";
+
+        String formattedAmount = amount.stripTrailingZeros().toPlainString();
+
+        String htmlContent = String.format(
+                "<html><body>" +
+                        "<h1>Withdraw Request Confirmation</h1>" +
+                        "<p>Hello %s,</p>" +
+                        "<p>Your withdraw request has been submitted successfully.</p>" +
+                        "<ul>" +
+                        "<li><strong>Amount:</strong> %s USD</li>" +
+                        "<li><strong>Request Date:</strong> %s</li>" +
+                        "<li><strong>Status:</strong> %s</li>" +
+                        "</ul>" +
+                        "<p>We will process your request soon. Thank you!</p>" +
+                        "</body></html>",
+                fullname,
+                formattedAmount,
+                requestDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                status.name()
+        );
+        sendEmail(email, subject, htmlContent);
     }
 }

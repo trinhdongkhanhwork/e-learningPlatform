@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.request.MessageRequest;
 import edu.cfd.e_learningPlatform.dto.request.SendInvatitionRequest;
+import edu.cfd.e_learningPlatform.dto.response.MessageFriendResponse;
 import edu.cfd.e_learningPlatform.dto.response.MessageResponse;
 import edu.cfd.e_learningPlatform.service.MessageService;
 import lombok.AccessLevel;
@@ -10,9 +11,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.Clock;
 import java.util.List;
 
 @RestController()
@@ -22,15 +26,16 @@ import java.util.List;
 public class MessageController {
 
     MessageService messageService;
+    SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/message/send")
-    @SendTo("/topic/receiveMessage")
-    public ResponseEntity<MessageResponse> sendMessage(@RequestBody MessageRequest messageRequest) {
-        return ResponseEntity.ok(messageService.sendMessage(messageRequest));
+    public void sendMessage(@Payload MessageRequest messageRequest) {
+        MessageResponse response = messageService.sendMessage(messageRequest);
+        messagingTemplate.convertAndSend("/message/" + response.getFriendId() + "/private", response);
     }
 
     @PostMapping("/get")
-    public ResponseEntity<List<MessageResponse>> getMessagesFriend(@RequestBody SendInvatitionRequest sendInvatitionRequest) {
+    public ResponseEntity<MessageFriendResponse> getMessagesFriend(@RequestBody SendInvatitionRequest sendInvatitionRequest) {
         return ResponseEntity.ok(messageService.getMessageFriend(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend()));
     }
 }

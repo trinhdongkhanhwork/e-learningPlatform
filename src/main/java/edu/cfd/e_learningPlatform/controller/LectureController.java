@@ -20,15 +20,4 @@ public class LectureController {
     public ResponseEntity<LectueUserResponse> getLecture(@PathVariable Long idLecture) {
         return ResponseEntity.ok(lectureService.getLectureUserById(idLecture));
     }
-
-//    @GetMapping
-//    ApiResponse<List<UserResponse>> getUsers() {
-//        var authentication = SecurityContextHolder.getContext().getAuthentication();
-//        log.info("Username: {}", authentication.getName());
-//        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-//
-//        return ApiResponse.<List<UserResponse>>builder()
-//                .result(userService.getUsers())
-//                .build();
-//    }
 }

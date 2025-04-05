@@ -24,10 +24,16 @@ public class Withdraw {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private String fullname;
+
     private BigDecimal price;
     private LocalDateTime requestDate = LocalDateTime.now();
     private String otp;
 
     @Enumerated(EnumType.STRING) // Để lưu enum dưới dạng chuỗi
     private WithdrawStatus status = WithdrawStatus.PENDING; // Mặc định là PENDING
+
+    private LocalDateTime otpCreationTime; // Thời gian tạo OTP
+
+    private LocalDateTime otpExpirationTime; // thời gian hết hạn OTP
 }
