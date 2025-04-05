@@ -36,6 +36,7 @@ public class TransactionsServiceIplm implements TransactionsService {
     TransactionRespository transactionRespository;
     UserRepository userRepository;
 
+    //lịch sử rút tiền theo user
     @Override
     public EarningsSummaryResponse getEarningsSummary(String userId) {
         User user = userRepository.findById(userId)
@@ -68,6 +69,7 @@ public class TransactionsServiceIplm implements TransactionsService {
         return new EarningsSummaryResponse(fullname, totalEarnings);
     }
 
+    //All lịch sử rút tiền
     @Override
     public List<WithdrawTransactionResponse> getAllWithdrawals() {
         List<String> withdrawlType = List.of("EARNING_WITHDRAWN", "ADMIN_WITHDRAWN");
@@ -87,6 +89,7 @@ public class TransactionsServiceIplm implements TransactionsService {
                         .collect(Collectors.toList());
     }
 
+    //thống kê rút tiền theo user
     @Override
     public Map<String, List<WithdrawlSummaryResponse>> getWithdrawalSummary(String userId) {
         User user  = userRepository.findById(userId)
@@ -103,6 +106,7 @@ public class TransactionsServiceIplm implements TransactionsService {
         return summary;
     }
 
+    //Transactions
     @Override
     public List<WithdrawlSummaryResponse> summarizeWithdrawls(List<Transactions> withdrawls, String timeFrame) {
         Map<String, BigDecimal> summaryMap = new HashMap<>();
@@ -138,6 +142,7 @@ public class TransactionsServiceIplm implements TransactionsService {
                 .collect(Collectors.toList());
     }
 
+    //thống kê rút tiền
     @Override
     public List<WithdrawlSummaryResponse> summarizeAllTransactions(String timeFrame) {
         // Lấy tất cả giao dịch
@@ -155,6 +160,24 @@ public class TransactionsServiceIplm implements TransactionsService {
     }
 
 
+    //Thống kê tiền vào theo user
+    @Override
+    public Map<String, List<WithdrawlSummaryResponse>> getWithdrawSummaryPayment(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        List<TransactionPayment> withdrawlPayment = transactionPaymentRepository.findByUserAndTypeIn(user, List.of("ADMIN_PROFIT","EARNING_PENDING"));
+        Map<String, List<WithdrawlSummaryResponse>> summary = new HashMap<>();
+
+        summary.put("hour", summarizeWithdrawlsPayment(withdrawlPayment, "hour"));
+        summary.put("day", summarizeWithdrawlsPayment(withdrawlPayment, "day"));
+        summary.put("month", summarizeWithdrawlsPayment(withdrawlPayment, "month"));
+        summary.put("year", summarizeWithdrawlsPayment(withdrawlPayment, "year"));
+
+        return summary;
+    }
+
+    //Transaction Payment
     @Override
     public List<WithdrawlSummaryResponse> summarizeWithdrawlsPayment(List<TransactionPayment> withdrawls, String timeFrame) {
         Map<String, BigDecimal> summaryMap = new HashMap<>();
@@ -189,7 +212,7 @@ public class TransactionsServiceIplm implements TransactionsService {
                 .collect(Collectors.toList());
     }
 
-
+    //thống kê tiền vào ví
     @Override
     public List<WithdrawlSummaryResponse> summarizwAllTransactionPayments(String timeFrame) {
         List<TransactionPayment> allTransactionPayments = transactionPaymentRepository.findAll();

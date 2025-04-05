@@ -51,10 +51,31 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(email);
-        helper.setSubject("OTP Confirmation");
-        helper.setText("Your OTP code is: " + otp, true);
+        helper.setSubject("Your OTP Code");
+
+        String htmlContent = String.format(
+                "<html>" +
+                        "<body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>" +
+                        "<div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>" +
+                        "<h2 style='color: #4CAF50;'>OTP Verification</h2>" +
+                        "<p>Hello,</p>" +
+                        "<p>We received a request to verify your identity. Please use the OTP code below to proceed:</p>" +
+                        "<div style='text-align: center; margin: 30px 0;'>" +
+                        "  <span style='font-size: 28px; font-weight: bold; color: #ffffff; background-color: #4CAF50; padding: 15px 30px; border-radius: 8px;'>%s</span>" +
+                        "</div>" +
+                        "<p>This OTP is valid for a limited time. If you did not request this, please ignore this email.</p>" +
+                        "<p>Thank you!</p>" +
+                        "<p style='color: #888888; font-size: 12px;'>This is an automated message, please do not reply.</p>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>",
+                otp
+        );
+
+        helper.setText(htmlContent, true);
         mailSender.send(message);
     }
+
 
     @Override
     public boolean verifyOTP(String request, String encryptedOtp, LocalDateTime creationTime, LocalDateTime expirationTime) {
@@ -169,4 +190,5 @@ public class EmailServiceImpl implements EmailService {
 
         sendEmail(email, subject, htmlContent);
     }
+
 }

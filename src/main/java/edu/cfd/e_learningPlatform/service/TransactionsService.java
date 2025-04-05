@@ -13,9 +13,14 @@ public interface TransactionsService {
 
     EarningsSummaryResponse getEarningsSummary(String userId);
     List<WithdrawTransactionResponse> getAllWithdrawals();
+
+    //Transactions
     Map<String, List<WithdrawlSummaryResponse>> getWithdrawalSummary(String userId);
     List<WithdrawlSummaryResponse> summarizeWithdrawls(List<Transactions> withdrawls, String timeFrame);
     List<WithdrawlSummaryResponse> summarizeAllTransactions(String timeFrame);
+
+    //Payment transaction
+    Map<String, List<WithdrawlSummaryResponse>> getWithdrawSummaryPayment(String userId);
     List<WithdrawlSummaryResponse> summarizeWithdrawlsPayment(List<TransactionPayment> withdrawls, String timeFrame);
     List<WithdrawlSummaryResponse> summarizwAllTransactionPayments(String timeFrame);
 }
