@@ -18,6 +18,5 @@ public class CommentRequest {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long videoId;
-    private int star;
     private Long parentId;
 }

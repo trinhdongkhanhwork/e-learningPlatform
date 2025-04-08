@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import edu.cfd.e_learningPlatform.config.VNPayConfig;
 import edu.cfd.e_learningPlatform.dto.request.PaymentRequest;
 import edu.cfd.e_learningPlatform.dto.response.PaymentResponseDto;
+import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.Payment;
 import edu.cfd.e_learningPlatform.entity.PaymentStatus;
@@ -13,6 +14,7 @@ import edu.cfd.e_learningPlatform.repository.PaymentStatusRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.EmailService;
 import edu.cfd.e_learningPlatform.service.VNPayService;
+import edu.cfd.e_learningPlatform.service.WalletService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -39,6 +41,7 @@ public class VNPayServiceImpl implements VNPayService {
     CourseRepository courseRepository;
     PaymentStatusRepository paymentStatusRepository;
     EmailService emailService;
+    WalletService walletService;
 
     private static String transactionId; // Biến tĩnh lưu mã giao dịch để sử dụng trong các phương thức
 
@@ -156,6 +159,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
     // Xử lý khi thanh toán thành công
+
     @Override
     public void successPay(HttpServletRequest request, String transactionNo) throws MessagingException {
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode"); // Mã phản hồi từ VNPay
@@ -183,11 +187,17 @@ public class VNPayServiceImpl implements VNPayService {
                 paymentRepository.save(payment);
             });
 
-            // Gửi email xác nhận
+            // Xử lý khi thanh toán thành công
             String email = getUserEmailById(userId);
             if (email != null) {
-                emailService.sendPaymentConfirmationEmail(email, transactionNo, priceInUSD.doubleValue());
+                emailService.sendPaymentConfirmationEmail(email, transactionNo, priceInUSD.doubleValue()); // Gửi email xác nhận
             }
+
+            // Cộng tiền vào ví admin và chia lợi nhuận
+            BigDecimal totalAmount = priceInUSD; // Số tiền đã quy đổi
+            Long courseId = payments.get(0).getCourse().getId(); // Lấy courseId từ payment đầu tiên
+            WalletResponse adminWalletResponse = walletService.depositToAdminWallet(courseId, totalAmount);
+
         } else {
             updatePaymentStatus(transactionNo, 2L); // Nếu thất bại, cập nhật trạng thái FAILED
             throw new RuntimeException("Payment failed or not completed.");
