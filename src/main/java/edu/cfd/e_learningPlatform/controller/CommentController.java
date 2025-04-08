@@ -1,5 +1,6 @@
 package edu.cfd.e_learningPlatform.controller;
 
+import edu.cfd.e_learningPlatform.entity.Comment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -31,17 +32,18 @@ public class CommentController {
     @MessageMapping("/comments/post")
     public void addComment(@RequestBody CommentRequest commentRequest) {
         CommentVideoResponse response = commentService.addComment(commentRequest);
-        messagingTemplate.convertAndSend("/comment/" + commentRequest.getVideoId() + "/private", response);
+        messagingTemplate.convertAndSend("/comment/" + response.getIdVideo() + "/post", response);
     }
 
     @MessageMapping("/comments/update")
-    public CommentVideoResponse updateComment(@RequestBody CommentRequest commentRequest) {
-        return commentService.updateComment(commentRequest);
+    public void updateComment(@RequestBody CommentRequest commentRequest) {
+        CommentVideoResponse response = commentService.updateComment(commentRequest);
+        messagingTemplate.convertAndSend("/comment/" + response.getIdVideo() + "/put", response);
     }
 
     @MessageMapping("/comments/delete")
-    public Long deleteComment(@RequestBody CommentVideoResponse commentVideoResponse) {
-        commentService.deleteComment(commentVideoResponse.getId());
-        return commentVideoResponse.getId();
+    public void deleteComment(Long idComment) {
+        Comment response = commentService.deleteComment(idComment);
+        messagingTemplate.convertAndSend("/comment/" + response.getVideo().getId() + "/delete", response.getId());
     }
 }

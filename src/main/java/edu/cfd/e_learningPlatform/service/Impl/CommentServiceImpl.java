@@ -41,9 +41,11 @@ public class CommentServiceImpl implements CommentService {
         List<CommentVideoResponse> commentVideoResponses = comments.stream()
                 .map(comment -> new CommentVideoResponse(
                         comment.getId(),
+                        comment.getUser().getId(),
                         comment.getUser().getFullname(),
                         comment.getUser().getAvatarUrl(),
                         comment.getCommentText(),
+                        comment.getVideo().getId(),
                         comment.getCreatedAt(),
                         comment.getComment() != null ? comment.getComment().getId() : null,
                         comment.getComment() != null ? comment.getComment().getUser().getFullname() : null
@@ -55,7 +57,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentVideoResponse addComment(CommentRequest commentRequest) {
         Comment comment = new Comment();
-        User parent = null;
         if (commentRequest.getUserId() != null) {
             User user = userRepository
                     .findById(commentRequest.getUserId())
@@ -69,7 +70,6 @@ public class CommentServiceImpl implements CommentService {
             Comment commentParent =
                     commentRepository.findById(commentRequest.getParentId()).orElse(null);
             comment.setComment(commentParent);
-            parent = commentParent.getUser();
         } else {
             comment.setComment(null);
         }
@@ -88,9 +88,11 @@ public class CommentServiceImpl implements CommentService {
 
         CommentVideoResponse commentVideoResponse = new CommentVideoResponse(
                 comment.getId(),
+                comment.getUser().getId(),
                 comment.getUser().getFullname(),
                 comment.getUser().getAvatarUrl(),
                 comment.getCommentText(),
+                comment.getVideo().getId(),
                 comment.getCreatedAt(),
                 comment.getComment() != null ? comment.getComment().getId() : null,
                 comment.getComment() != null ? comment.getComment().getUser().getFullname() : null
@@ -100,45 +102,36 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentVideoResponse updateComment(CommentRequest commentRequest) {
-        Comment comment = new Comment();
-        if (commentRequest.getUserId() != null) {
-            User user = userRepository
-                    .findById(commentRequest.getUserId())
-                    .orElseThrow(() -> new RuntimeException("Not found User"));
-            comment.setUser(user);
-        } else {
-            comment.setUser(null);
-        }
+        Comment comment = commentRepository.findById(commentRequest.getId())
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (commentRequest.getParentId() != null) {
-            Comment commentParent =
-                    commentRepository.findById(commentRequest.getParentId()).orElse(null);
-            comment.setComment(commentParent);
-        } else {
-            comment.setComment(null);
-        }
-
-        if (commentRequest.getVideoId() != null) {
-            Video video = videoReponsitory.findById(commentRequest.getVideoId()).orElse(null);
-            comment.setVideo(video);
-        } else {
-            comment.setVideo(null);
-        }
         comment.setId(commentRequest.getId());
         comment.setCommentText(commentRequest.getCommentText());
         comment.setUpdatedAt(LocalDateTime.now());
         commentRepository.save(comment);
-        return null;
+
+        CommentVideoResponse commentVideoResponse = new CommentVideoResponse(
+                comment.getId(),
+                comment.getUser().getId(),
+                comment.getUser().getFullname(),
+                comment.getUser().getAvatarUrl(),
+                comment.getCommentText(),
+                comment.getVideo().getId(),
+                comment.getCreatedAt(),
+                comment.getComment() != null ? comment.getComment().getId() : null,
+                comment.getComment() != null ? comment.getComment().getUser().getFullname() : null
+        );
+        return commentVideoResponse;
     }
 
     @Override
-    public Long deleteComment(Long idComment) {
+    public Comment deleteComment(Long idComment) {
         if (commentRepository.existsById(idComment)) {
             Comment commentIndex = commentRepository.findById(idComment).orElse(null);
-
+            Comment commentReturn = commentIndex;
             while (commentIndex != null) {
                 List<Comment> commentChilds =
-                        commentRepository.findByReplyId(commentIndex.getId()); // Lấy ra comment con
+                    commentRepository.findByReplyId(commentIndex.getId()); // Lấy ra comment con
                 if (commentChilds.size() <= 0) { // Nếu không có comment con thì xóa
                     commentRepository.delete(commentIndex);
                     commentIndex = commentRepository.findById(idComment).orElse(null);
@@ -146,7 +139,7 @@ public class CommentServiceImpl implements CommentService {
                     commentIndex = commentChilds.get(0);
                 }
             }
-            return idComment;
+            return commentReturn;
         } else {
             throw new RuntimeException("Not found comment");
         }
