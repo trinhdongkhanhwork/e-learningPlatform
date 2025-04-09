@@ -9,10 +9,14 @@ import edu.cfd.e_learningPlatform.dto.request.PaymentRequest;
 import edu.cfd.e_learningPlatform.dto.response.PaymentResponseDto;
 import jakarta.mail.MessagingException;
 
-public interface PaypalService {
-    Payment createPayment(Double total, String currency, PaypalPaymentMethod method, PaypalPaymentIntent intent, String description, String cancelUrl, String successUrl) throws PayPalRESTException;
+import java.math.BigDecimal;
 
+public interface PaypalService {
     Payment executePayment(String paymentId, String payerId) throws PayPalRESTException;
+
+    Payment createPayment(BigDecimal total, String currency, PaypalPaymentMethod method,
+                          PaypalPaymentIntent intent, String description,
+                          String cancelUrl, String successUrl) throws PayPalRESTException;
 
     PaymentResponseDto processMultiplePayments(PaymentRequest request) throws PayPalRESTException;
 
