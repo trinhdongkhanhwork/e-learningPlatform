@@ -1,7 +1,13 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
 import edu.cfd.e_learningPlatform.entity.Course;
+import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
@@ -13,6 +19,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -96,6 +103,23 @@ public class EmailServiceImpl implements EmailService {
         helper.setSubject("OTP Confirmation");
         helper.setText("Your OTP code is: " + otp, true);
         mailSender.send(message);
+    }
+
+    public void sendCertificateEmail(User user, Course course, byte[] pdfBytes) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(user.getEmail());
+            helper.setSubject("Your Course Certificate");
+            helper.setText("Congratulations " + user.getFullname() + "!\n\nYour certificate is attached.");
+
+            helper.addAttachment("certificate.pdf", new ByteArrayResource(pdfBytes));
+
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send certificate email", e);
+        }
     }
 
     @Override

@@ -4,9 +4,8 @@ import lombok.Data;
 
 @Data
 public class ProgressUpdateRequest {
-    private Long courseId;
-    private Long sectionId;
+    private String userId;
     private Long lectureId;
-    private Integer timeSpent;
-    private Integer score;
+    private Integer currentSecond;
+    private boolean completed;
 }
