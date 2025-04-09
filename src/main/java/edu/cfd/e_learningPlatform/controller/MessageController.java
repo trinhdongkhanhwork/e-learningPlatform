@@ -31,7 +31,7 @@ public class MessageController {
     @MessageMapping("/message/send")
     public void sendMessage(@Payload MessageRequest messageRequest) {
         MessageResponse response = messageService.sendMessage(messageRequest);
-        messagingTemplate.convertAndSend("/message/" + response.getFriendId() + "/private", response);
+        messagingTemplate.convertAndSend("/message/" + response.getFriendId() + "/post", response);
     }
 
     @PostMapping("/get")

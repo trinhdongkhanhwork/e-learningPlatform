@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.cfd.e_learningPlatform.dto.request.CommentRequest;
 import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
+import edu.cfd.e_learningPlatform.entity.Comment;
 
 public interface CommentService {
     List<CommentVideoResponse> getCommentVideo(Long idVideo);
@@ -12,5 +13,5 @@ public interface CommentService {
 
     CommentVideoResponse updateComment(CommentRequest commentRequest);
 
-    Long deleteComment(Long idComment);
+    Comment deleteComment(Long idComment);
 }

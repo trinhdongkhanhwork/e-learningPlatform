@@ -8,6 +8,7 @@ import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+import edu.cfd.e_learningPlatform.entity.User;
 
 public interface UserService {
     UserResponse createUser(UserCreationRequest request);
@@ -29,6 +30,8 @@ public interface UserService {
     void deleteUser(String userId);
 
     void updatePassWord(String email, UpdatePassWordRequest request, boolean vail);
+
+    User getCurrentUser();
 
     ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request);
 }
