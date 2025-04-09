@@ -3,6 +3,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import edu.cfd.e_learningPlatform.config.AuditorAwareImpl;
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -32,10 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserServiceImpl implements UserService {
-    UserRepository userRepository;
-    RoleRepository roleRepository;
-    UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditorAwareImpl auditorAware;
+
 
     @Override
     public UserResponse getMyInfo() {
@@ -133,6 +136,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
     }
+
     @Override
     public ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request) {
         // Tìm user theo ID
@@ -168,5 +172,13 @@ public class UserServiceImpl implements UserService {
                 .roleEntity(updatedUser.getRoleEntity())
                 .avatarUrl(updatedUser.getAvatarUrl())
                 .build();
+    }
+
+    @Override
+    public User getCurrentUser() {
+        String username = auditorAware.getCurrentAuditor().orElse("Anonymous");
+        ;
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 }
