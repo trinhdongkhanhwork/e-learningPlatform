@@ -6,6 +6,7 @@ import edu.cfd.e_learningPlatform.dto.response.WithdrawlSummaryResponse;
 import edu.cfd.e_learningPlatform.entity.TransactionPayment;
 import edu.cfd.e_learningPlatform.entity.Transactions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,4 +24,17 @@ public interface TransactionsService {
     Map<String, List<WithdrawlSummaryResponse>> getWithdrawSummaryPayment(String userId);
     List<WithdrawlSummaryResponse> summarizeWithdrawlsPayment(List<TransactionPayment> withdrawls, String timeFrame);
     List<WithdrawlSummaryResponse> summarizwAllTransactionPayments(String timeFrame);
+
+
+    //Xuất lịch sử rút tiền ra file excel
+    byte[] exportWithdrawlHistoryToExcel(String userId, LocalDateTime startDate, LocalDateTime endDate);
+
+    //Xuất lịch sử tiền vào ra file excel
+    byte[] exportMoneyHistoryToExcel(String userId, LocalDateTime startDate, LocalDateTime endDate);
+
+    //xuất excel tất cả lịch xử rút tiền excel
+    byte[] exportAllTransactionToExcel(LocalDateTime startDate, LocalDateTime endDate);
+
+    //xuất excel tất cả lịch xử thanh toán excel
+    byte[] exportAllTransactionPaymentToExcel(LocalDateTime startDate, LocalDateTime endDate);
 }

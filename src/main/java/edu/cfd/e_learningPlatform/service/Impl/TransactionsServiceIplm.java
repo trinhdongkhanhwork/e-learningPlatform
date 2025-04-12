@@ -16,8 +16,12 @@ import edu.cfd.e_learningPlatform.service.TransactionsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -225,6 +229,372 @@ public class TransactionsServiceIplm implements TransactionsService {
 
         return summarizeWithdrawlsPayment(filteredTransactionPayment,timeFrame);
     }
+
+    //xuất excel lịch sử rút tiền của user
+    @Override
+    public byte[] exportWithdrawlHistoryToExcel(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        List<Transactions> withdrawlTransactions = transactionRespository.findByUserAndTypeInAndCreatedAtBetween(
+                user,
+                List.of("EARNING_WITHDRAWN", "ADMIN_WITHDRAWN"),
+                startDate,
+                endDate
+        );
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()){
+
+            //tạo sheet Excel
+            Sheet sheet = workbook.createSheet("Lịch sử rút tiền");
+
+            //Tạo header cho file
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Họ tên", "Trạng thái","Ngày giao dịch", "Số tiền"};
+
+            //tạo style cho header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            // Bold style for total row
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldStyle.setFont(boldFont);
+
+            //tạo các header cell
+            for (int i =0; i< columns.length; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Calculate total amount
+            BigDecimal totalAmount = withdrawlTransactions.stream()
+                    .map(Transactions::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            //format date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            //format currency
+            CellStyle currencyStyle = workbook.createCellStyle();
+            DataFormat df = workbook.createDataFormat();
+            currencyStyle.setDataFormat(df.getFormat("###,### $"));
+
+            // Bold currency style for total amount
+            CellStyle boldCurrencyStyle = workbook.createCellStyle();
+            boldCurrencyStyle.setDataFormat(df.getFormat("###,### $"));
+            boldCurrencyStyle.setFont(boldFont);
+
+            //điền dữ liệu
+            int rowNum = 1;
+            for (Transactions transactions : withdrawlTransactions){
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(transactions.getId());
+                row.createCell(1).setCellValue(transactions.getFullname());
+                row.createCell(2).setCellValue(String.valueOf(transactions.getStatus()));
+                row.createCell(3).setCellValue(transactions.getCreatedAt().format(formatter));
+
+                Cell amountCell = row.createCell(4);
+                amountCell.setCellValue(transactions.getAmount().doubleValue());
+                amountCell.setCellStyle(currencyStyle);
+            }
+
+            // Add total row
+            Row totalRow = sheet.createRow(rowNum);
+            Cell totalLabelCell = totalRow.createCell(3);
+            totalLabelCell.setCellValue("Tổng cộng:");
+            totalLabelCell.setCellStyle(boldStyle);
+
+            Cell totalAmountCell = totalRow.createCell(4);
+            totalAmountCell.setCellValue(totalAmount.doubleValue());
+            totalAmountCell.setCellStyle(boldCurrencyStyle);
+
+            //auto size cho các cột
+            for (int i = 0; i< columns.length; i++){
+                sheet.autoSizeColumn(i);
+            }
+
+            //ghi workbook ra byteArrayOutputStream
+            workbook.write(out);
+            return out.toByteArray();
+        }catch (IOException e){
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public byte[] exportMoneyHistoryToExcel(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        List<TransactionPayment> withdrawlTransactions = transactionPaymentRepository.findByUserAndTypeInAndCreatedAtBetween(
+                user,
+                List.of("ADMIN_PROFIT", "EARNING_PENDING"),
+                startDate,
+                endDate
+        );
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()){
+
+            Sheet sheet = workbook.createSheet("Lịch sử rút tiền");
+
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Họ tên","Ngày giao dịch", "Số tiền"};
+
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            //tạo các header cell
+            for (int i =0; i< columns.length; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            //format date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            //format currency
+            CellStyle currencyStyle = workbook.createCellStyle();
+            DataFormat df = workbook.createDataFormat();
+            currencyStyle.setDataFormat(df.getFormat("###,### $"));
+
+            // Bold style for total row
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldStyle.setFont(boldFont);
+
+            // Bold currency style for total amount
+            CellStyle boldCurrencyStyle = workbook.createCellStyle();
+            boldCurrencyStyle.setDataFormat(df.getFormat("###,### $"));
+            boldCurrencyStyle.setFont(boldFont);
+
+            // Calculate total amount
+            BigDecimal totalAmount = withdrawlTransactions.stream()
+                    .map(TransactionPayment::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            //điền dữ liệu
+            int rowNum = 1;
+            for (TransactionPayment transactions : withdrawlTransactions){
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(transactions.getId());
+                row.createCell(1).setCellValue(transactions.getFullname());
+                row.createCell(2).setCellValue(transactions.getCreatedAt().format(formatter));
+
+                Cell amountCell = row.createCell(3);
+                amountCell.setCellValue(transactions.getAmount().doubleValue());
+                amountCell.setCellStyle(currencyStyle);
+            }
+
+            // Add total row
+            Row totalRow = sheet.createRow(rowNum);
+            Cell totalLabelCell = totalRow.createCell(3);
+            totalLabelCell.setCellValue("Tổng cộng:");
+            totalLabelCell.setCellStyle(boldStyle);
+
+            Cell totalAmountCell = totalRow.createCell(4);
+            totalAmountCell.setCellValue(totalAmount.doubleValue());
+            totalAmountCell.setCellStyle(boldCurrencyStyle);
+
+            //auto size cho các cột
+            for (int i = 0; i< columns.length; i++){
+                sheet.autoSizeColumn(i);
+            }
+
+            //ghi workbook ra byteArrayOutputStream
+            workbook.write(out);
+            return out.toByteArray();
+        }catch (IOException e){
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public byte[] exportAllTransactionToExcel(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Transactions> allTransaction = transactionRespository.findByCreatedAtBetween(startDate,endDate);
+
+        try(Workbook workbook = new XSSFWorkbook();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+
+            Sheet sheet = workbook.createSheet("Lịch sử rút tiền");
+
+            //Tạo header cho file
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Họ tên", "Trạng thái","Ngày giao dịch", "Số tiền"};
+
+            //tạo style cho header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            // Bold style for total row
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldStyle.setFont(boldFont);
+
+            //tạo các header cell
+            for (int i =0; i< columns.length; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            //format date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            //format currency
+            CellStyle currencyStyle = workbook.createCellStyle();
+            DataFormat df = workbook.createDataFormat();
+            currencyStyle.setDataFormat(df.getFormat("###,### $"));
+
+            //format boldCurrencyStyle
+            CellStyle boldCurrencyStyle = workbook.createCellStyle();
+            boldCurrencyStyle.setDataFormat(df.getFormat("###,### $"));
+            boldCurrencyStyle.setFont(boldFont);
+
+            // Calculate total amount
+            BigDecimal totalAmount = allTransaction.stream()
+                    .map(Transactions::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            //điền dữ liệu
+            int rowNum = 1;
+            for (Transactions transactions : allTransaction){
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(transactions.getId());
+                row.createCell(1).setCellValue(transactions.getFullname());
+                row.createCell(2).setCellValue(String.valueOf(transactions.getStatus()));
+                row.createCell(3).setCellValue(transactions.getCreatedAt().format(formatter));
+
+                Cell amountCell = row.createCell(4);
+                amountCell.setCellValue(transactions.getAmount().doubleValue());
+                amountCell.setCellStyle(currencyStyle);
+            }
+
+            Row totalRow = sheet.createRow(rowNum);
+            Cell totalLabelCell = totalRow.createCell(3);
+            totalLabelCell.setCellValue("Tổng cộng:");
+            totalLabelCell.setCellStyle(boldStyle);
+
+            Cell totalAmountCell = totalRow.createCell(4);
+            totalAmountCell.setCellValue(totalAmount.doubleValue());
+            totalAmountCell.setCellStyle(boldCurrencyStyle);
+
+            //auto size cho các cột
+            for (int i = 0; i< columns.length; i++){
+                sheet.autoSizeColumn(i);
+            }
+
+            //ghi workbook ra byteArrayOutputStream
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }catch (IOException e){
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public byte[] exportAllTransactionPaymentToExcel(LocalDateTime startDate, LocalDateTime endDate) {
+        List<TransactionPayment> allTransaction = transactionPaymentRepository.findByCreatedAtBetween(startDate, endDate);
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Lịch sử rút tiền");
+
+            //Tạo header cho file
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Họ tên", "Trạng thái", "Ngày giao dịch", "Số tiền"};
+
+            //tạo style cho header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            // Bold style for total row
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldStyle.setFont(boldFont);
+
+            //tạo các header cell
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            //format date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+            //format currency
+            CellStyle currencyStyle = workbook.createCellStyle();
+            DataFormat df = workbook.createDataFormat();
+            currencyStyle.setDataFormat(df.getFormat("###,### $"));
+
+            //format boldCurrencyStyle
+            CellStyle boldCurrencyStyle = workbook.createCellStyle();
+            boldCurrencyStyle.setDataFormat(df.getFormat("###,### $"));
+            boldCurrencyStyle.setFont(boldFont);
+
+            // Calculate total amount
+            BigDecimal totalAmount = allTransaction.stream()
+                    .map(TransactionPayment::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            //điền dữ liệu
+            int rowNum = 1;
+            for (TransactionPayment transactions : allTransaction) {
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(transactions.getId());
+                row.createCell(1).setCellValue(transactions.getFullname());
+                row.createCell(2).setCellValue(String.valueOf(transactions.getStatus()));
+                row.createCell(3).setCellValue(transactions.getCreatedAt().format(formatter));
+
+                Cell amountCell = row.createCell(4);
+                amountCell.setCellValue(transactions.getAmount().doubleValue());
+                amountCell.setCellStyle(currencyStyle);
+            }
+
+            Row totalRow = sheet.createRow(rowNum);
+            Cell totalLabelCell = totalRow.createCell(3);
+            totalLabelCell.setCellValue("Tổng cộng:");
+            totalLabelCell.setCellStyle(boldStyle);
+
+            Cell totalAmountCell = totalRow.createCell(4);
+            totalAmountCell.setCellValue(totalAmount.doubleValue());
+            totalAmountCell.setCellStyle(boldCurrencyStyle);
+
+            //auto size cho các cột
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            //ghi workbook ra byteArrayOutputStream
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }
 
