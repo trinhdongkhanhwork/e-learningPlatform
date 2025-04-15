@@ -426,13 +426,18 @@ public class CourseServiceImpl implements CourseService {
         categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        // Lấy danh sách khóa học theo categoryId
         List<Course> courses = courseRepository.findByCategoryId(categoryId);
 
-        // Chuyển sang CourseResponse
+        // Chuyển sang CourseResponse, đồng thời tính số lượng người đã ghi danh cho mỗi khóa học
         return courses.stream()
-                .map(courseMapper::toCourseResponse)
+                .map(course -> {
+                    CourseResponse courseResponse = courseMapper.toCourseResponse(course);
+                    long enrolledCount = paymentRepository.countByCourseIdAndEnrollmentTrue(course.getId());
+                    courseResponse.setEnrolledUserCount(enrolledCount);
+                    return courseResponse;
+                })
                 .collect(Collectors.toList());
     }
+
 
 }

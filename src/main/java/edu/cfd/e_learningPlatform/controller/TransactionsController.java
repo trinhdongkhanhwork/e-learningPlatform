@@ -70,7 +70,7 @@ public class TransactionsController {
         return ResponseEntity.ok(summary);
     }
 
-
+    // rut tien theo user
     @PostMapping("/export/withdrawl-history")
     public ResponseEntity<byte[]> exportWithdrawlHistory(
             @RequestBody ExportWithdrawlHistoryRequest request) {
@@ -89,6 +89,7 @@ public class TransactionsController {
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
 
+    //tien vao theo user
     @PostMapping("/export/money-history")
     public ResponseEntity<byte[]> exportMoneyHistory(
             @RequestBody ExportWithdrawlHistoryRequest request) {
@@ -106,7 +107,7 @@ public class TransactionsController {
 
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
-
+    // xuat theo admin xuat all
     @PostMapping("/export/all/withdraw-history")
     public ResponseEntity<byte[]> exportAllWithdrawlHistory(
             @RequestBody ExportWithdrawlHistoryRequest request) {
@@ -124,6 +125,7 @@ public class TransactionsController {
         return new ResponseEntity<>(file, headers, HttpStatus.OK);
     }
 
+    //xuat excel tien vao vi
     @PostMapping("/export/all/money-history")
     public ResponseEntity<byte[]> exportAllMoneyHistory(
             @RequestBody ExportWithdrawlHistoryRequest request) {
