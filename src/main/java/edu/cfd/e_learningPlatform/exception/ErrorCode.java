@@ -37,7 +37,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(1030,"Category not found" ,HttpStatus.NOT_FOUND ),
     ENROLLMENT_FALSE(1031,"Enrollment false" ,HttpStatus.NOT_FOUND ),
     RATING_USER_NOT_FOUND(1031,"Rating and user not found" ,HttpStatus.NOT_FOUND ),
-    RATING_NOT_FOUND(1032,"Rating not found", HttpStatus.NOT_FOUND);
+    RATING_NOT_FOUND(1032,"Rating not found", HttpStatus.NOT_FOUND),
+    INTERNAL_SERVER_ERROR(1028,"Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
