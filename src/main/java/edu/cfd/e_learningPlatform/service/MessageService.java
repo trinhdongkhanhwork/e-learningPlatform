@@ -9,4 +9,5 @@ import java.util.List;
 public interface MessageService {
     MessageResponse sendMessage(MessageRequest messageRequest);
     MessageFriendResponse getMessageFriend(String idUser, String idFriend);
+    MessageResponse recallMessage(Long idMessage);
 }
