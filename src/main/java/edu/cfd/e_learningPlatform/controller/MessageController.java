@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -31,7 +32,13 @@ public class MessageController {
     @MessageMapping("/message/send")
     public void sendMessage(@Payload MessageRequest messageRequest) {
         MessageResponse response = messageService.sendMessage(messageRequest);
-        messagingTemplate.convertAndSend("/message/" + response.getFriendId() + "/post", response);
+        messagingTemplate.convertAndSend("/message/" + response.getFriendId(), response);
+    }
+
+    @MessageMapping("/message/recall/{id}")
+    public void recallMessage(@DestinationVariable Long id) {
+        MessageResponse response = messageService.recallMessage(id);
+        messagingTemplate.convertAndSend("/message/" + response.getFriendId(), response);
     }
 
     @PostMapping("/get")

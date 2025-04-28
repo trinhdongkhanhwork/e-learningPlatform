@@ -42,6 +42,7 @@ public class MessageServiceImpl implements MessageService {
         message.setFriend(friend);
         message.setCreatedAt(LocalDateTime.now());
         message.setUser(user);
+        message.setRecall(true);
         try {
            message = messageRepository.save(message);
            return messageMapper.messageToMessageResponse(message);
@@ -57,5 +58,13 @@ public class MessageServiceImpl implements MessageService {
         if(friend.getStatus() != FriendStatus.FRIEND) throw new RuntimeException("Friend is not friend !");
         List<Message> messages = messageRepository.findMessagesByFriendId(friend.getId());
         return new MessageFriendResponse(friendMapper.friendToFriendResponse(friend), messageMapper.messagesToMessageResponses(messages));
+    }
+
+    @Override
+    public MessageResponse recallMessage(Long idMessage) {
+        Message message = messageRepository.findById(idMessage).orElseThrow(() -> new RuntimeException("Message not found !"));
+        message.setRecall(false);
+        messageRepository.save(message);
+        return messageMapper.messageToMessageResponse(message);
     }
 }

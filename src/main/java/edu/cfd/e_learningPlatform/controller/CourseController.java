@@ -42,7 +42,7 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<CourseResponse>> getAllCourses(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size) {
         return ResponseEntity.ok(courseService.getAllCourses(page, size));
     }
 
@@ -70,10 +70,5 @@ public class CourseController {
     public ResponseEntity<List<CourseResponse>> getCoursesByCategoryId(@PathVariable Long categoryId){
         List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
         return ResponseEntity.ok(courses);
-    }
-
-    @GetMapping("/count")
-    public ResponseEntity<Long> getTotalCourses() {
-        return ResponseEntity.ok(courseService.getTotalCourses());
     }
 }
