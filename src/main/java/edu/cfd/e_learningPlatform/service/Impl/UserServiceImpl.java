@@ -175,6 +175,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public long getUserCountByRoleId() {
+        return userRepository.countUsersByRoleId();
+    }
+
+    @Override
     public User getCurrentUser() {
         String username = auditorAware.getCurrentAuditor().orElse("Anonymous");
         ;

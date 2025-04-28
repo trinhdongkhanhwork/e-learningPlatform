@@ -343,7 +343,7 @@ public class TransactionsServiceIplm implements TransactionsService {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()){
 
-            Sheet sheet = workbook.createSheet("Lịch sử rút tiền");
+            Sheet sheet = workbook.createSheet("Lịch sử tiền nạp ví");
 
             Row headerRow = sheet.createRow(0);
             String[] columns = {"ID", "Họ tên","Ngày giao dịch", "Số tiền"};
@@ -519,7 +519,7 @@ public class TransactionsServiceIplm implements TransactionsService {
 
             //Tạo header cho file
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "Họ tên", "Trạng thái", "Ngày giao dịch", "Số tiền"};
+            String[] columns = {"ID", "Họ tên", "Ngày giao dịch", "Số tiền"};
 
             //tạo style cho header
             CellStyle headerStyle = workbook.createCellStyle();
@@ -565,20 +565,19 @@ public class TransactionsServiceIplm implements TransactionsService {
 
                 row.createCell(0).setCellValue(transactions.getId());
                 row.createCell(1).setCellValue(transactions.getFullname());
-                row.createCell(2).setCellValue(String.valueOf(transactions.getStatus()));
-                row.createCell(3).setCellValue(transactions.getCreatedAt().format(formatter));
+                row.createCell(2).setCellValue(transactions.getCreatedAt().format(formatter));
 
-                Cell amountCell = row.createCell(4);
+                Cell amountCell = row.createCell(3);
                 amountCell.setCellValue(transactions.getAmount().doubleValue());
                 amountCell.setCellStyle(currencyStyle);
             }
 
             Row totalRow = sheet.createRow(rowNum);
-            Cell totalLabelCell = totalRow.createCell(3);
+            Cell totalLabelCell = totalRow.createCell(2);
             totalLabelCell.setCellValue("Tổng cộng:");
             totalLabelCell.setCellStyle(boldStyle);
 
-            Cell totalAmountCell = totalRow.createCell(4);
+            Cell totalAmountCell = totalRow.createCell(3);
             totalAmountCell.setCellValue(totalAmount.doubleValue());
             totalAmountCell.setCellStyle(boldCurrencyStyle);
 

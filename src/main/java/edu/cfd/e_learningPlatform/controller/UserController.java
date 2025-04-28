@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -107,5 +108,10 @@ public class UserController {
         return ApiResponse.<ProfileUpdateResponse>builder()
                 .result(updatedProfile)
                 .build();
+    }
+
+    @GetMapping("/count/instructor")
+    public ResponseEntity<Long> getUserCountByRole1() {
+        return ResponseEntity.ok(userService.getUserCountByRoleId());
     }
 }

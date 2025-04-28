@@ -13,5 +13,6 @@ public interface RatingMapper {
     @Mapping(source = "course.id",target = "courseId")
     @Mapping(source = "user.id",target = "userId")
     @Mapping(source = "user.fullname",target = "fullname")
+    @Mapping(source = "user.avatarUrl", target = "avatarUrl")
     RatingResponse toResponse (Rating rating);
 }
