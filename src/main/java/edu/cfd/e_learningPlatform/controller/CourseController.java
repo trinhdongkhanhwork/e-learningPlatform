@@ -71,4 +71,9 @@ public class CourseController {
         List<CourseResponse> courses = courseService.getCoursesByCategoryId(categoryId);
         return ResponseEntity.ok(courses);
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCourses() {
+        return ResponseEntity.ok(courseService.getTotalCourses());
+    }
 }
