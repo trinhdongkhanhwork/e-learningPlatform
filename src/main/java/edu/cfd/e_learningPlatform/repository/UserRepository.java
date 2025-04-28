@@ -22,4 +22,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     String findEmailById(String id);
 
     Optional<User> findByRoleEntity_RoleName(String roleName);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.roleEntity.id = 1")
+    long countUsersByRoleId();
+
+
 }

@@ -22,4 +22,6 @@ public interface CourseService {
     void deleteCourse(Long id);
 
     List<CourseResponse> getCoursesByCategoryId(Long categoryId);
+
+    long getTotalCourses();
 }

@@ -94,7 +94,7 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
             Video video = new Video();
             video.setFileName(fileName);
             video.setDuration(getVideoDuration(file));
-            video.setVideoUrl("https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName + UUID.randomUUID());
+            video.setVideoUrl("https://" + BUCKET_NAME + ".s3.amazonaws.com/" + fileName);
             videos.add(video);
 
             // Update video list
@@ -124,7 +124,7 @@ public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Servi
 
     private String formatDuration(String durationStr) {
         // Chuyển đổi chuỗi thời gian thành số nguyên (giây)
-        int durationInSeconds = Integer.parseInt(durationStr);
+        double durationInSeconds = Double.parseDouble(durationStr);
 
         // Nếu nhỏ hơn 60 giây, trả về giá trị giây
         return String.valueOf(durationInSeconds);

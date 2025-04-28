@@ -132,7 +132,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse getCourseById(Long id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+        Course course = courseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         // Tính số lượng người đã ghi danh vào khóa học
         long enrolledCount = paymentRepository.countByCourseIdAndEnrollmentTrue(course.getId());
@@ -433,6 +433,11 @@ public class CourseServiceImpl implements CourseService {
         return courses.stream()
                 .map(courseMapper::toCourseResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long getTotalCourses() {
+        return courseRepository.count();
     }
 
 }

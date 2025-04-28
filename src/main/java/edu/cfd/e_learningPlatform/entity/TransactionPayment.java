@@ -29,7 +29,6 @@ public class TransactionPayment {
 
     String fullname;
 
-    WithdrawStatus status;
 
     @Column(nullable = false)
     BigDecimal amount;

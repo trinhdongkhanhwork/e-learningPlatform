@@ -34,4 +34,6 @@ public interface UserService {
     User getCurrentUser();
 
     ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request);
+
+    long getUserCountByRoleId();
 }
