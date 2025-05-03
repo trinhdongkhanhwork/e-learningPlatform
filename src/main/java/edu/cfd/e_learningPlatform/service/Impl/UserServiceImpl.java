@@ -6,6 +6,10 @@ import java.util.List;
 import edu.cfd.e_learningPlatform.config.AuditorAwareImpl;
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
+import edu.cfd.e_learningPlatform.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
+import org.eclipse.angus.mail.util.MailConnectException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuditorAwareImpl auditorAware;
+    private final EmailService emailService;
 
 
     @Override
@@ -80,6 +85,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse registerInstructor(){
+        User user = getCurrentUser();
+        user.setActive(true);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse accessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("INSTRUCTOR").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoleEntity(role);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse notAccessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(false);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
     public void updateRoles(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Role defaultRole = roleRepository
@@ -109,9 +136,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
+    @Transactional
     @Override
     public List<UserResponse> getUsersUpdateTeacher() {
-        return userRepository.findAll().stream()
+        return userRepository.findAll()
+                .stream()
                 .filter(user -> !user.isActive())
                 .filter(user -> "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()))
                 .map(userMapper::toUserResponse)
@@ -182,7 +211,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getCurrentUser() {
         String username = auditorAware.getCurrentAuditor().orElse("Anonymous");
-        ;
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }

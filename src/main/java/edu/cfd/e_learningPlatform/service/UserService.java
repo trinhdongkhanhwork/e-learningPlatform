@@ -9,6 +9,7 @@ import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
+import jakarta.mail.MessagingException;
 
 public interface UserService {
     UserResponse createUser(UserCreationRequest request);
@@ -22,6 +23,11 @@ public interface UserService {
     UserResponse getUser(String id);
 
     UserResponse updateUser(String userId, UserUpdateRequest request);
+
+    UserResponse registerInstructor()throws MessagingException;
+
+    UserResponse accessInstructor(String userId) throws MessagingException;
+    UserResponse notAccessInstructor(String userId) throws MessagingException;
 
     void updateTeacher(String userId);
 
