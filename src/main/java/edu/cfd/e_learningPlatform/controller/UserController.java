@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,8 +50,8 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping("/getListUsersUpdateTeacher")
-    ApiResponse<List<UserResponse>> getUsersUpdateTeacher() {
+    @GetMapping("/getListRegisterInstructor")
+    ApiResponse<List<UserResponse>> getListRegisterInstructor() {
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getUsersUpdateTeacher())
                 .build();
@@ -73,6 +74,34 @@ public class UserController {
     ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(userId, request))
+                .build();
+    }
+
+    @PutMapping("/registerInstructor")
+    ApiResponse<UserResponse> registerInstructor() throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.registerInstructor())
+                .build();
+    }
+
+    @PutMapping("/deleteInstructor/{userId}")
+    ApiResponse<UserResponse> deleteInstructor(@PathVariable String userId) throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.accessInstructor(userId))
+                .build();
+    }
+
+    @PutMapping("/accessInstructor/{userId}")
+    ApiResponse<UserResponse> accessInstructor(@PathVariable String userId) throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.accessInstructor(userId))
+                .build();
+    }
+
+    @PutMapping("/notAccessInstructor/{userId}")
+    ApiResponse<UserResponse> notAccessInstructor(@PathVariable String userId) throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.notAccessInstructor(userId))
                 .build();
     }
 
