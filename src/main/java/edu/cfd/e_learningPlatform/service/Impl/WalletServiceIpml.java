@@ -44,7 +44,7 @@ public class WalletServiceIpml implements WalletService {
         // Tìm người dùng có permission_id = 1
         User privilegedUser = userRepository.findAll().stream()
                 .filter(user -> user.getPermissions().stream()
-                        .anyMatch(permission -> permission.getId().equals(1L)))
+                        .anyMatch(permission -> permission.getName().equals("ADMIN_SYSTEM")))
                 .findFirst()
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
