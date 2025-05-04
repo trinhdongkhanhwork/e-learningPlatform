@@ -1,7 +1,6 @@
 package edu.cfd.e_learningPlatform.service;
 
 import edu.cfd.e_learningPlatform.dto.request.*;
-import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.StaffResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
@@ -29,9 +28,9 @@ public interface UserService {
 
     void updatePassWord(String email, UpdatePassWordRequest request, boolean vail);
 
-    User getCurrentUser();
+    UserResponse updateProfile(String userId, ProfileUpdateRequest request);
 
-    ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request);
+    User getCurrentUser();
 
 //    long getUserCountByRoleId();
 
