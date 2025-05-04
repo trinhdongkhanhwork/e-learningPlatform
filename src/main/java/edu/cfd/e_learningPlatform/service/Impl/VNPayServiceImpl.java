@@ -194,9 +194,10 @@ public class VNPayServiceImpl implements VNPayService {
             }
 
             // Cộng tiền vào ví admin và chia lợi nhuận
-            BigDecimal totalAmount = priceInUSD; // Số tiền đã quy đổi
-            Long courseId = payments.get(0).getCourse().getId(); // Lấy courseId từ payment đầu tiên
-            WalletResponse adminWalletResponse = walletService.depositToAdminWallet(courseId, totalAmount);
+            List<Long> ids = new ArrayList<>();
+            payments.forEach(
+                    payment -> walletService.depositToAdminWallet(payment.getCourse().getId(), payment.getCourse().getPrice())
+            );
 
         } else {
             updatePaymentStatus(transactionNo, 2L); // Nếu thất bại, cập nhật trạng thái FAILED

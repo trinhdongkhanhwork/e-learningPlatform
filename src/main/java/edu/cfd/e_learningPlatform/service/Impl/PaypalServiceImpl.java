@@ -253,9 +253,10 @@ public class PaypalServiceImpl implements PaypalService {
             }
 
             // Cộng tiền vào ví admin và chia lợi nhuận
-            BigDecimal totalAmount = BigDecimal.valueOf(price);
-            Long courseId = payments.get(0).getCourse().getId(); // Lấy courseId từ payment đầu tiên
-            WalletResponse adminWalletResponse = walletService.depositToAdminWallet(courseId, totalAmount);
+            List<Long> ids = new ArrayList<>();
+            payments.forEach(
+                    payment -> walletService.depositToAdminWallet(payment.getCourse().getId(), payment.getCourse().getPrice())
+            );
 
             return "http://localhost:8081/vue/payment-success"; // Trả về URL thành công cho frontend
         }
