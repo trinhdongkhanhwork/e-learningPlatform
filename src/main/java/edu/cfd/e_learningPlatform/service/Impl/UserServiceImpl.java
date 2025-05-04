@@ -2,7 +2,6 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.config.AuditorAwareImpl;
 import edu.cfd.e_learningPlatform.dto.request.*;
-import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.StaffResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.Permission;
@@ -141,7 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request) {
+    public UserResponse updateProfile(String userId, ProfileUpdateRequest request) {
         // Tìm user theo ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -166,17 +165,8 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user);
 
         // Trả về response
-        return ProfileUpdateResponse.builder()
-                .id(updatedUser.getId())
-                .username(updatedUser.getUsername())
-                .email(updatedUser.getEmail())
-                .fullname(updatedUser.getFullname())
-                .phone(updatedUser.getPhone())
-                .roleEntity(updatedUser.getRoles().stream().findFirst().orElse(null))
-                .avatarUrl(updatedUser.getAvatarUrl())
-                .build();
+        return userMapper.toUserResponse(updatedUser);
     }
-
 //    @Override
 //    public long getUserCountByRoleId() {
 //        return userRepository.countUsersByRoleId();
