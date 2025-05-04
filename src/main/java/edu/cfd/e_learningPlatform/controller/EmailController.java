@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
+import edu.cfd.e_learningPlatform.dto.request.StatusAccountRequest;
 import edu.cfd.e_learningPlatform.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -28,4 +29,9 @@ public class EmailController {
         return ResponseEntity.ok(Map.of("message", "Email sent to: " +approvedCourseRequest.getEmail()+" successfully"));
     }
 
+    @PostMapping("/emailStaff")
+    public ResponseEntity<Map<String, String>> emailStaff(@Valid @RequestBody StatusAccountRequest request) throws MessagingException {
+        emailService.sendEmailStaff(request);
+        return ResponseEntity.ok(Map.of("message", "Email sent to: " +request.getEmail()+" successfully"));
+    }
 }

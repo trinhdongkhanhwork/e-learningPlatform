@@ -1,10 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.VideoDto;
 import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
 import edu.cfd.e_learningPlatform.dto.response.VideoInlectureResponse;
@@ -14,6 +9,10 @@ import edu.cfd.e_learningPlatform.repository.CommentRepository;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
 import edu.cfd.e_learningPlatform.service.CommentService;
 import edu.cfd.e_learningPlatform.service.VideoService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoServiceImpl implements VideoService {

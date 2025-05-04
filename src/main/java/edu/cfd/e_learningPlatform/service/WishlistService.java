@@ -1,9 +1,9 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.request.WishlistRequest;
 import edu.cfd.e_learningPlatform.dto.response.WishlistDtoResponse;
+
+import java.util.List;
 
 public interface WishlistService {
 

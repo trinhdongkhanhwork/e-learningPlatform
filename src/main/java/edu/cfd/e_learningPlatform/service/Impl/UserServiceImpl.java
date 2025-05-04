@@ -1,9 +1,10 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.config.AuditorAwareImpl;
+
+import edu.cfd.e_learningPlatform.dto.request.*;
+import edu.cfd.e_learningPlatform.dto.response.StaffResponse;
+
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.service.EmailService;
@@ -18,12 +19,15 @@ import org.springframework.stereotype.Service;
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
+
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+import edu.cfd.e_learningPlatform.entity.Permission;
 import edu.cfd.e_learningPlatform.entity.Role;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import edu.cfd.e_learningPlatform.mapstruct.UserMapper;
+import edu.cfd.e_learningPlatform.repository.PermissionRepository;
 import edu.cfd.e_learningPlatform.repository.RoleRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.UserService;
@@ -31,6 +35,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +55,11 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuditorAwareImpl auditorAware;
+
+    private final PermissionRepository permissionRepository;
+
     private final EmailService emailService;
+
 
 
     @Override
@@ -68,12 +85,49 @@ public class UserServiceImpl implements UserService {
         Role defaultRole =
                 roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        user.setRoleEntity(defaultRole);
+        user.setRoles(Set.of(defaultRole));
         user.setCreatedDate(now);
-        user.setActive(false);
+        user.setActive(true);
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @Override
+    public Boolean isRegisterInstructor() {
+        User user = getCurrentUser();
+        return user.isActive() || user.getRoles().stream()
+                .map(Role::getRoleName)
+                .anyMatch(roleName -> roleName.equals("INSTRUCTOR"));    }
+
+    @Override
+    public UserResponse deleteInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoles(Set.of(role)
+        );        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse registerInstructor(){
+        User user = getCurrentUser();
+        user.setActive(true);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse accessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("INSTRUCTOR").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoles(Set.of(role)
+        );
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse notAccessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(false);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
     @Override
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -121,7 +175,7 @@ public class UserServiceImpl implements UserService {
                 .findByRoleName("INSTRUCTOR")
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        user.setRoleEntity(defaultRole);
+        user.setRoles(Set.of(defaultRole));
         userRepository.save(user);
     }
 
@@ -147,9 +201,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<UserResponse> getUsersUpdateTeacher() {
+
+        return userRepository.findAll().stream()
+                .filter(user -> user.isActive() || "INSTRUCTOR".equals(user.getRoles().stream().map(Role::getRoleName).
+                        filter(roleName -> roleName.equals("INSTRUCTOR")).findFirst().orElse(null)))
+
         return userRepository.findAll()
                 .stream()
                 .filter(user -> user.isActive() || "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()))
+
                 .map(userMapper::toUserResponse)
                 .toList();
     }
@@ -174,7 +234,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request) {
+    public UserResponse updateProfile(String userId, ProfileUpdateRequest request) {
         // Tìm user theo ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -199,26 +259,72 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userRepository.save(user);
 
         // Trả về response
-        return ProfileUpdateResponse.builder()
-                .id(updatedUser.getId())
-                .username(updatedUser.getUsername())
-                .email(updatedUser.getEmail())
-                .fullname(updatedUser.getFullname())
-                .phone(updatedUser.getPhone())
-                .roleEntity(updatedUser.getRoleEntity())
-                .avatarUrl(updatedUser.getAvatarUrl())
-                .build();
+        return userMapper.toUserResponse(updatedUser);
     }
-
-    @Override
-    public long getUserCountByRoleId() {
-        return userRepository.countUsersByRoleId();
-    }
+//    @Override
+//    public long getUserCountByRoleId() {
+//        return userRepository.countUsersByRoleId();
+//    }
 
     @Override
     public User getCurrentUser() {
         String username = auditorAware.getCurrentAuditor().orElse("Anonymous");
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
+    @Override
+    public UserResponse createAccountStaff(StaffCreationRequest request) {
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new AppException(ErrorCode.USER_EXISTED);
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        user.setEmail(request.getEmail());
+        user.setFullname(request.getFullname());
+        user.setBirthday(request.getBirthday());
+        user.setGender(request.getGender());
+        user.setPhone(request.getPhone());
+        user.setAvatarUrl(request.getAvatarUrl());
+        user.setActive(true);
+        user.setUpdatedDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        Role defaultRole = roleRepository.findByRoleName("ADMIN")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+
+        user.setRoles(Set.of(defaultRole));
+        user.setCreatedDate(now);
+        List<String> permissionNames = request.getPermissions();
+        Set<Permission> permissions = permissionNames.stream()
+                .map(name -> permissionRepository.findByName(name).orElseThrow(
+                        () -> new RuntimeException("Permission no exists"))).collect(Collectors.toSet());
+        user.setPermissions(permissions);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public List<StaffResponse> getStaffs() {
+        List<User> users = userRepository.findAdminsWithPermissions();
+        return users.stream()
+                .map(user -> {
+                    StaffResponse staffResponse = new StaffResponse();
+                    staffResponse.setId(user.getId());
+                    staffResponse.setUsername(user.getUsername());
+                    staffResponse.setEmail(user.getEmail());
+                    staffResponse.setFullname(user.getFullname());
+                    staffResponse.setBirthday(user.getBirthday());
+                    staffResponse.setGender(user.getGender());
+                    staffResponse.setPhone(user.getPhone());
+                    staffResponse.setEnabled(user.isActive());
+                    staffResponse.setAvatarUrl(user.getAvatarUrl());
+                    staffResponse.setPermissions(
+                            user.getPermissions().stream()
+                                    .map(Permission::getName)
+                                    .collect(Collectors.toSet())
+                    );
+                    return staffResponse;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -2,10 +2,7 @@
 package edu.cfd.e_learningPlatform.repository;
 
 
-import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.Payment;
-import edu.cfd.e_learningPlatform.entity.PaymentStatus;
-import edu.cfd.e_learningPlatform.entity.User;
 import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 
 @Repository

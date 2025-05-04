@@ -2,10 +2,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.response.WithdrawResponse;
 import edu.cfd.e_learningPlatform.dto.response.WithdrawTransactionResponse;
-import edu.cfd.e_learningPlatform.entity.Transactions;
-import edu.cfd.e_learningPlatform.entity.User;
-import edu.cfd.e_learningPlatform.entity.Wallet;
-import edu.cfd.e_learningPlatform.entity.Withdraw;
+import edu.cfd.e_learningPlatform.entity.*;
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import edu.cfd.e_learningPlatform.exception.AppException;
 import edu.cfd.e_learningPlatform.exception.ErrorCode;
@@ -43,7 +40,6 @@ public class WithdrawServiceImpl implements WithdrawService {
     EmailService emailService;
     PasswordEncoder passwordEncoder;
 
-
     @Transactional
     @Override
     public WithdrawResponse withdraw(String userId, BigDecimal amount) {
@@ -51,13 +47,16 @@ public class WithdrawServiceImpl implements WithdrawService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Lấy ví admin
-        User admin = userRepository.findByRoleEntity_RoleName("ADMIN")
-                .orElseThrow(() -> new AppException(ErrorCode.USER_ROLE_NOT_FOUND));
-        Wallet adminWallet = walletRespository.findByUser(admin)
+        // Lấy ví của người dùng có permission_id = 1
+        User privilegedUser = userRepository.findAll().stream()
+                .filter(u -> u.getPermissions().stream()
+                        .anyMatch(permission -> permission.getId().equals(1L)))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Wallet adminWallet = walletRespository.findByUser(privilegedUser)
                 .orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_FOUND));
 
-        // Kiểm tra số dư ví admin
+        // Kiểm tra số dư ví
         if (adminWallet.getBalance().compareTo(amount) < 0) {
             throw new AppException(ErrorCode.WALLET_BALANCE_NOT_ENOUGH);
         }
@@ -104,7 +103,6 @@ public class WithdrawServiceImpl implements WithdrawService {
 
     @Transactional
     public WithdrawResponse confirmWithdraw(String userId, String otpInput, Long withdrawId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -113,7 +111,7 @@ public class WithdrawServiceImpl implements WithdrawService {
                 .orElseThrow(() -> new AppException(ErrorCode.WITHDRAW_NOT_FOUND));
 
         // Kiểm tra xem yêu cầu rút tiền thuộc về user không
-        if (!withdraw.getUser ().getId().equals(userId)) {
+        if (!withdraw.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -135,23 +133,27 @@ public class WithdrawServiceImpl implements WithdrawService {
             throw new AppException(ErrorCode.OTP_VERIFICATION_FAILED);
         }
 
-        // Lấy ví admin
-        User admin = userRepository.findByRoleEntity_RoleName("ADMIN")
-                .orElseThrow(() -> new AppException(ErrorCode.USER_ROLE_NOT_FOUND));
-        Wallet adminWallet = walletRespository.findByUser (admin)
+        // Lấy ví của người dùng có permission_id = 1
+        User privilegedUser = userRepository.findAll().stream()
+                .filter(u -> u.getPermissions().stream()
+                        .anyMatch(permission -> permission.getId().equals(1L)))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Wallet adminWallet = walletRespository.findByUser(privilegedUser)
                 .orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_FOUND));
 
         BigDecimal amount = withdraw.getPrice();
 
-        // Trừ tiền từ ví admin
+        // Trừ tiền từ ví
         adminWallet.setBalance(adminWallet.getBalance().subtract(amount));
         adminWallet.setUpdateAt(LocalDateTime.now());
         walletRespository.save(adminWallet);
 
         // Ghi giao dịch rút cho user
-        String transactionType = "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()) ? "EARNING_WITHDRAWN" : "ADMIN_WITHDRAWN";
+        String transactionType = user.getRoles().stream()
+                .anyMatch(role -> role.getId().equals(1L)) ? "EARNING_WITHDRAWN" : "ADMIN_WITHDRAWN";
         Transactions userTransaction = new Transactions();
-        userTransaction.setUser (user);
+        userTransaction.setUser(user);
         userTransaction.setAmount(amount);
         userTransaction.setType(transactionType);
         userTransaction.setFullname(user.getFullname());
@@ -209,7 +211,7 @@ public class WithdrawServiceImpl implements WithdrawService {
                         withdraw.getPrice(),
                         withdraw.getRequestDate(),
                         withdraw.getStatus().name(),
-                        withdraw.getUser ().getEmail(),
+                        withdraw.getUser().getEmail(),
                         withdraw.getStatus(),
                         withdraw.getFullname()
                 ))

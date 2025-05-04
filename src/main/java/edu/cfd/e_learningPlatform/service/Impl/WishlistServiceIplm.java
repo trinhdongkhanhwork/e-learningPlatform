@@ -1,11 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.util.List;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.request.WishlistRequest;
 import edu.cfd.e_learningPlatform.dto.response.WishlistDtoResponse;
 import edu.cfd.e_learningPlatform.entity.Course;
@@ -18,9 +12,13 @@ import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.repository.WishlistRepository;
 import edu.cfd.e_learningPlatform.service.WishlistService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

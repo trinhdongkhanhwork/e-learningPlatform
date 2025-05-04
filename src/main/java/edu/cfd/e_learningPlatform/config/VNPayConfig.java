@@ -1,15 +1,11 @@
 package edu.cfd.e_learningPlatform.config;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Component;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 @Component
 public class VNPayConfig {

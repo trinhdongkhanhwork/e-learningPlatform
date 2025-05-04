@@ -1,19 +1,20 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
-import java.util.List;
-
+import edu.cfd.e_learningPlatform.dto.request.CountStatusCourseDtoRequest;
+import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
+import edu.cfd.e_learningPlatform.dto.response.CountStatusCourseResponse;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.dto.response.UserResponse;
+import edu.cfd.e_learningPlatform.entity.Course;
+import edu.cfd.e_learningPlatform.entity.User;
+import edu.cfd.e_learningPlatform.repository.UserRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.dto.response.UserResponse;
-import edu.cfd.e_learningPlatform.entity.Course;
-import edu.cfd.e_learningPlatform.entity.User;
-import edu.cfd.e_learningPlatform.repository.UserRepository;
+import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -31,6 +32,12 @@ public abstract class CourseMapper {
     @Mapping(source = "instructor", target = "instructor", qualifiedByName = "userToUserResponse")
     @Mapping(source = "category.id", target = "categoryId")
     public abstract CourseResponse toCourseResponse(Course course);
+
+    @Mapping(source = "publishedCourseCount", target = "publishedCourseCount")
+    @Mapping(source = "pendingCourseCount", target = "pendingCourseCount")
+    @Mapping(source = "draftCourseCount", target = "draftCourseCount")
+    public abstract CountStatusCourseResponse toCountStatusCourseResponse(CountStatusCourseDtoRequest countStatusCourseDtoRequest);
+
 
     @Named("stringToUser")
     User stringToUser(String instructor) {

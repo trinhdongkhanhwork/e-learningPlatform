@@ -1,7 +1,9 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 import edu.cfd.e_learningPlatform.dto.*;
-import edu.cfd.e_learningPlatform.dto.request.*;
+import edu.cfd.e_learningPlatform.dto.request.CountStatusCourseDtoRequest;
+import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
+import edu.cfd.e_learningPlatform.dto.response.CountStatusCourseResponse;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
 import edu.cfd.e_learningPlatform.entity.*;
 import edu.cfd.e_learningPlatform.exception.AppException;
@@ -438,6 +440,16 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public long getTotalCourses() {
         return courseRepository.count();
+    }
+
+    @Override
+    public CountStatusCourseResponse countStatusCourse() {
+        List<Course> courses = courseRepository.findAll();
+        long publishedCount = courses.stream().filter(Course::isPublished).count();
+        long draftCount = courses.size() - publishedCount;
+        long pendingCount = 0;
+        CountStatusCourseDtoRequest countStatusCourseDtoRequest = new CountStatusCourseDtoRequest(publishedCount, pendingCount, draftCount);
+        return courseMapper.toCountStatusCourseResponse(countStatusCourseDtoRequest);
     }
 
 }

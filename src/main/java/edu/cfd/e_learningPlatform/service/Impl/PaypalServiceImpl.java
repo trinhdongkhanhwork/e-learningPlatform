@@ -11,7 +11,10 @@ import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.PaymentStatus;
 import edu.cfd.e_learningPlatform.entity.User;
-import edu.cfd.e_learningPlatform.repository.*;
+import edu.cfd.e_learningPlatform.repository.CourseRepository;
+import edu.cfd.e_learningPlatform.repository.PaymentRepository;
+import edu.cfd.e_learningPlatform.repository.PaymentStatusRepository;
+import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.EmailService;
 import edu.cfd.e_learningPlatform.service.PaypalService;
 import edu.cfd.e_learningPlatform.service.WalletService;
@@ -250,9 +253,10 @@ public class PaypalServiceImpl implements PaypalService {
             }
 
             // Cộng tiền vào ví admin và chia lợi nhuận
-            BigDecimal totalAmount = BigDecimal.valueOf(price);
-            Long courseId = payments.get(0).getCourse().getId(); // Lấy courseId từ payment đầu tiên
-            WalletResponse adminWalletResponse = walletService.depositToAdminWallet(courseId, totalAmount);
+            List<Long> ids = new ArrayList<>();
+            payments.forEach(
+                    payment -> walletService.depositToAdminWallet(payment.getCourse().getId(), payment.getCourse().getPrice())
+            );
 
             return "http://localhost:8081/vue/payment-success"; // Trả về URL thành công cho frontend
         }

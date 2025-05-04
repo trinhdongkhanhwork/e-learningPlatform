@@ -1,7 +1,8 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.io.IOException;
-
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.service.CourseService;
+import edu.cfd.e_learningPlatform.utils.PdfGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,9 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.service.CourseService;
-import edu.cfd.e_learningPlatform.utils.PdfGenerator;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/courses")

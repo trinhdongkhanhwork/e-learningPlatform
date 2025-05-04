@@ -1,14 +1,8 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
-
-import java.io.ByteArrayOutputStream;
 import edu.cfd.e_learningPlatform.dto.LectureDto;
 import edu.cfd.e_learningPlatform.dto.SectionDto;
 import edu.cfd.e_learningPlatform.dto.request.ProgressUpdateRequest;
@@ -21,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

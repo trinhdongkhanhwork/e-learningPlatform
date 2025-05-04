@@ -1,14 +1,15 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
+
+
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
@@ -21,6 +22,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -61,6 +67,41 @@ public class UserController {
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
+                .build();
+    }
+
+    @GetMapping("/isRegisterInstructor")
+    ApiResponse<UserResponse> isRegisterInstructor() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
+
+    @PutMapping("/registerInstructor")
+    ApiResponse<UserResponse> registerInstructor() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.registerInstructor())
+                .build();
+    }
+
+//    @PutMapping("/deleteInstructor/{userId}")
+//    ApiResponse<UserResponse> deleteInstructor(@PathVariable String userId) throws MessagingException {
+//        return ApiResponse.<UserResponse>builder()
+//                .result(userService.deleteInstructor(userId))
+//                .build();
+//    }
+
+//    @PutMapping("/accessInstructor/{userId}")
+//    ApiResponse<UserResponse> accessInstructor(@PathVariable String userId) throws MessagingException {
+//        return ApiResponse.<UserResponse>builder()
+//                .result(userService.accessInstructor(userId))
+//                .build();
+//    }
+
+    @PutMapping("/notAccessInstructor/{userId}")
+    ApiResponse<UserResponse> notAccessInstructor(@PathVariable String userId) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.notAccessInstructor(userId))
                 .build();
     }
 
@@ -130,17 +171,17 @@ public class UserController {
                 .build();
     }
     @PutMapping("/profile/{userId}")
-    public ApiResponse<ProfileUpdateResponse> updateProfile(
+    public ApiResponse<UserResponse> updateProfile(
             @PathVariable String userId,
             @ModelAttribute ProfileUpdateRequest request) {
-        ProfileUpdateResponse updatedProfile = userService.updateProfile(userId, request);
-        return ApiResponse.<ProfileUpdateResponse>builder()
+        UserResponse updatedProfile = userService.updateProfile(userId, request);
+        return ApiResponse.<UserResponse>builder()
                 .result(updatedProfile)
                 .build();
     }
-
-    @GetMapping("/count/instructor")
-    public ResponseEntity<Long> getUserCountByRole1() {
-        return ResponseEntity.ok(userService.getUserCountByRoleId());
-    }
+//
+//    @GetMapping("/count/instructor")
+//    public ResponseEntity<Long> getUserCountByRole1() {
+//        return ResponseEntity.ok(userService.getUserCountByRoleId());
+//    }
 }

@@ -1,6 +1,5 @@
 package edu.cfd.e_learningPlatform.entity;
 
-import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

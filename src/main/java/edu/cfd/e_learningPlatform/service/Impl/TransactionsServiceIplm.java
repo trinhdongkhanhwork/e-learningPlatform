@@ -1,6 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import edu.cfd.e_learningPlatform.dto.response.EarningsSummaryResponse;
 import edu.cfd.e_learningPlatform.dto.response.WithdrawTransactionResponse;
 import edu.cfd.e_learningPlatform.dto.response.WithdrawlSummaryResponse;
@@ -48,7 +47,6 @@ public class TransactionsServiceIplm implements TransactionsService {
 
         BigDecimal totalEarnings;
         String fullname = user.getFullname();
-        String role = user.getRoleEntity().getRoleName();
 
         // Tính tổng số tiền đã rút từ Transactions
         BigDecimal totalWithdrawn = transactionRespository.findByUserAndTypeIn(user, List.of("EARNING_WITHDRAWN", "ADMIN_WITHDRAWN"))

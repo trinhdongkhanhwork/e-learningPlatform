@@ -1,10 +1,9 @@
 package edu.cfd.e_learningPlatform.service;
 
-import org.springframework.data.domain.Page;
-
-import edu.cfd.e_learningPlatform.dto.CourseDto;
 import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
+import edu.cfd.e_learningPlatform.dto.response.CountStatusCourseResponse;
 import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -22,6 +21,8 @@ public interface CourseService {
     void deleteCourse(Long id);
 
     List<CourseResponse> getCoursesByCategoryId(Long categoryId);
+
+    CountStatusCourseResponse countStatusCourse();
 
     long getTotalCourses();
 }

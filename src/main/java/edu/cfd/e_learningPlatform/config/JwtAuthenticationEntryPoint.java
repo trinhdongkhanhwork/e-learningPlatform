@@ -1,19 +1,16 @@
 package edu.cfd.e_learningPlatform.config;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
+import edu.cfd.e_learningPlatform.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.exception.ErrorCode;
+import java.io.IOException;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override

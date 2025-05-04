@@ -1,6 +1,5 @@
 package edu.cfd.e_learningPlatform.entity;
 
-import edu.cfd.e_learningPlatform.enums.FriendStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

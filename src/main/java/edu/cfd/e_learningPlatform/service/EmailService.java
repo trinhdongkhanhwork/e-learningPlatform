@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.service;
 
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
+import edu.cfd.e_learningPlatform.dto.request.StatusAccountRequest;
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import jakarta.mail.MessagingException;
 
@@ -14,7 +15,7 @@ public interface EmailService {
     void sendOTPEmailForCreationUser(String email,String username, String otp) throws MessagingException;
     void sendEmailApprovedCourse(ApprovedCourseRequest approvedCourseRequest) throws MessagingException;
     void sendEmailDeleteCourse(Long id);
-
+    void sendEmailStaff(StatusAccountRequest request) throws MessagingException;
     void sendEmail(String to, String subject, String htmlContent) throws MessagingException;
 
     void sendPaymentConfirmationEmail(String email, String paymentId, Double price) throws MessagingException;

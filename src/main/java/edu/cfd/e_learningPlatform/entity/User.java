@@ -1,14 +1,14 @@
 package edu.cfd.e_learningPlatform.entity;
 
+import edu.cfd.e_learningPlatform.enums.Gender;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
-
-import jakarta.persistence.*;
-
-import edu.cfd.e_learningPlatform.enums.Gender;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import java.util.Set;
 
 @Data
 @Builder
@@ -60,13 +60,22 @@ public class User {
     @Column(name = "version")
     int version;
 
-    @Column(name = "active", nullable = false)
-    private boolean active;
+    @Column(name = "is_active")
+    private boolean isActive;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role roleEntity;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 
-    private BigDecimal price;
-
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_permissions",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions;
 }

@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendUserResponse {
-    private FriendResponse friendStatus;
-    private UserResponse user;
+    private FriendStatus friendStatus;
+    private String userId;
+    private String avatarUrl;
+    private String fullName;
 }

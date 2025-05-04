@@ -1,7 +1,6 @@
 package edu.cfd.e_learningPlatform.service;
 
 import edu.cfd.e_learningPlatform.dto.response.WalletResponse;
-import edu.cfd.e_learningPlatform.dto.response.WithdrawResponse;
 
 import java.math.BigDecimal;
 

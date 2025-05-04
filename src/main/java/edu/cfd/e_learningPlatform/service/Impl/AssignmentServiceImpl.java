@@ -1,7 +1,5 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.AssignmentDto;
 import edu.cfd.e_learningPlatform.mapstruct.AssignmentMapper;
 import edu.cfd.e_learningPlatform.repository.AssignmentRepository;
@@ -9,6 +7,7 @@ import edu.cfd.e_learningPlatform.service.AssignmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

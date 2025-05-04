@@ -1,8 +1,9 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.io.IOException;
-import java.util.List;
-
+import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
+import edu.cfd.e_learningPlatform.dto.response.UploadImageResponse;
+import edu.cfd.e_learningPlatform.entity.Video;
+import edu.cfd.e_learningPlatform.service.S3Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.dto.response.UploadImageResponse;
-import edu.cfd.e_learningPlatform.entity.Video;
-import edu.cfd.e_learningPlatform.service.S3Service;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/s3/upload")

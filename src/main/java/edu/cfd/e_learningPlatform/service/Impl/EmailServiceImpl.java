@@ -1,11 +1,7 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
-
-import java.io.ByteArrayOutputStream;
-import java.time.LocalDateTime;
 import edu.cfd.e_learningPlatform.dto.request.ApprovedCourseRequest;
+import edu.cfd.e_learningPlatform.dto.request.StatusAccountRequest;
 import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
@@ -213,6 +209,35 @@ public class EmailServiceImpl implements EmailService {
         );
 
         sendEmail(email, subject, htmlContent);
+    }
+
+
+
+    @Override
+    public void sendEmailStaff(StatusAccountRequest request) throws MessagingException {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if (user != null) {
+            user.setActive(request.isAccountStatus());
+            userRepository.save(user);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setSubject("Account status information: " + request.getUsername());
+            helper.setTo(request.getEmail());
+
+            String htmlContent = "<html><body>" +
+                    "<p>Hello " + request.getUsername() + ",</p>" +
+                    "<p>Your account is now in status: " +
+                    (request.isAccountStatus() ? "<span style='color:green;'>Active</span>" : "<span style='color:red;'>Inactive</span>") +
+                    "</p>" +
+                    "<p>" + request.getText() + "</p>" +
+                    "</body></html>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(mimeMessage);
+        }else {
+            throw new RuntimeException("User not found");
+        }
     }
 
 }

@@ -1,11 +1,10 @@
 package edu.cfd.e_learningPlatform.repository;
 
-import java.util.Optional;
-
+import edu.cfd.e_learningPlatform.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import edu.cfd.e_learningPlatform.entity.Role;
+import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, String> {

@@ -1,9 +1,9 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.VideoDto;
 import edu.cfd.e_learningPlatform.dto.response.VideoInlectureResponse;
+
+import java.util.List;
 
 public interface VideoService {
     VideoInlectureResponse getVideoLecture(Long videoId);

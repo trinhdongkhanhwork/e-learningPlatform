@@ -1,10 +1,10 @@
 package edu.cfd.e_learningPlatform.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import edu.cfd.e_learningPlatform.enums.WithdrawStatus;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class WithdrawDto {
