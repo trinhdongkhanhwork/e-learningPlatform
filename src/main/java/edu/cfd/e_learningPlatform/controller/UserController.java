@@ -84,6 +84,13 @@ public class UserController {
                 .build();
     }
 
+    @PutMapping("/deleteInstructor/{userId}")
+    ApiResponse<UserResponse> deleteInstructor(@PathVariable String userId) throws MessagingException {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.accessInstructor(userId))
+                .build();
+    }
+
     @PutMapping("/accessInstructor/{userId}")
     ApiResponse<UserResponse> accessInstructor(@PathVariable String userId) throws MessagingException {
         return ApiResponse.<UserResponse>builder()

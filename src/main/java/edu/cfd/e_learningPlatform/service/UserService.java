@@ -24,9 +24,12 @@ public interface UserService {
 
     UserResponse updateUser(String userId, UserUpdateRequest request);
 
+    UserResponse deleteInstructor(String userId) throws MessagingException;
+
     UserResponse registerInstructor()throws MessagingException;
 
     UserResponse accessInstructor(String userId) throws MessagingException;
+
     UserResponse notAccessInstructor(String userId) throws MessagingException;
 
     void updateTeacher(String userId);

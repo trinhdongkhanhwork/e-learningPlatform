@@ -85,6 +85,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse deleteInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoleEntity(role);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
     public UserResponse registerInstructor(){
         User user = getCurrentUser();
         user.setActive(true);
@@ -141,8 +149,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getUsersUpdateTeacher() {
         return userRepository.findAll()
                 .stream()
-                .filter(user -> !user.isActive())
-                .filter(user -> "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()))
+                .filter(user -> user.isActive() || "INSTRUCTOR".equals(user.getRoleEntity().getRoleName()))
                 .map(userMapper::toUserResponse)
                 .toList();
     }
