@@ -1,6 +1,7 @@
 package edu.cfd.e_learningPlatform.repository;
 
 import edu.cfd.e_learningPlatform.dto.response.FriendUserResponse;
+import edu.cfd.e_learningPlatform.dto.response.InvitationResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.Friend;
 import edu.cfd.e_learningPlatform.entity.User;
@@ -23,14 +24,14 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             "and f.status = 1")
     List<User> selectFriends(@Param("idUser") String idUser);
 
-    @Query("SELECT new edu.cfd.e_learningPlatform.dto.response.FriendUserResponse(new edu.cfd.e_learningPlatform.dto.response.FriendResponse(f.id, f.user.id, f.friend.id, f.createdAt, f.status), new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.isActive, u.roles)) " +
+    @Query("SELECT new edu.cfd.e_learningPlatform.dto.response.FriendUserResponse(f.status, u.id , u.avatarUrl, u.fullname) " +
             "FROM User u LEFT JOIN Friend f ON (f.user = u OR f.friend = u) " +
             "                                  AND (f.user.id = :idUser OR f.friend.id = :idUser) " +
             "WHERE LOWER(u.fullname) LIKE LOWER(CONCAT('%', TRIM(:keyword), '%')) AND u.id NOT LIKE :idUser AND :keyword NOT LIKE ''")
     List<FriendUserResponse> findByFullnameContaining(String keyword, String idUser);
 
-    @Query("select new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.isActive, u.roles) " +
+    @Query("select new edu.cfd.e_learningPlatform.dto.response.InvitationResponse(u.id, u.fullname, u.avatarUrl) " +
             "from User u left join Friend f on u = f.user " +
             "where f.status = 0 and f.friend.id = :idUser")
-    List<UserResponse> selectInvitation(String idUser);
+    List<InvitationResponse> selectInvitation(String idUser);
 }

@@ -2,6 +2,7 @@ package edu.cfd.e_learningPlatform.service.Impl;
 
 
 import edu.cfd.e_learningPlatform.dto.response.FriendUserResponse;
+import edu.cfd.e_learningPlatform.dto.response.InvitationResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.Friend;
 import edu.cfd.e_learningPlatform.entity.User;
@@ -30,7 +31,7 @@ public class FriendServiceImpl implements FriendService {
     UserMapper userMapper;
 
     @Override
-    public UserResponse sendInvitation(String idUser, String idFriend) {
+    public InvitationResponse sendInvitation(String idUser, String idFriend) {
         Friend friend = friendRepository.existFriend(idUser, idFriend);
         User user = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("User not found !"));
         if (friend == null && !idUser.equals(idFriend)) {
@@ -45,26 +46,26 @@ public class FriendServiceImpl implements FriendService {
                 throw new RuntimeException("Error invitation friend: " + e.getMessage());
             }
             friendMapper.friendToFriendResponse(friend);
-            return userMapper.toUserResponse(user);
+            return userMapper.toInvitationResponse(user);
         } else {
             throw new RuntimeException("Alreadly friends !");
         }
     }
 
     @Override
-    public List<UserResponse> getInvitations(String idUser) {
+    public List<InvitationResponse> getInvitations(String idUser) {
         return friendRepository.selectInvitation(idUser);
     }
 
     @Override
-    public UserResponse confirmInvitation(String idUser, String idFriend, FriendStatus status) {
+    public InvitationResponse confirmInvitation(String idUser, String idFriend, FriendStatus status) {
         Friend friend = friendRepository.existFriend(idUser, idFriend);
         User user = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("User not found !"));
         if (friend == null && !idUser.equals(idFriend)) throw new RuntimeException("Friend not found !");
         friend.setStatus(status);
         try {
            friendRepository.save(friend);
-           return userMapper.toUserResponse(user);
+           return userMapper.toInvitationResponse(user);
         } catch (Exception e) {
             throw new RuntimeException("Error updating friend: " + e.getMessage());
         }
@@ -83,9 +84,9 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public List<UserResponse> getFriends(String idUser) {
+    public List<InvitationResponse> getFriends(String idUser) {
         List<User> users = friendRepository.selectFriends(idUser);
-        return userMapper.toUserResponses(users);
+        return userMapper.toInvitationResponses(users);
     }
 
     @Override
