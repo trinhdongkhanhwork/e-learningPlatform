@@ -4,6 +4,7 @@ import edu.cfd.e_learningPlatform.dto.request.*;
 import edu.cfd.e_learningPlatform.dto.response.StaffResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 
@@ -29,6 +30,14 @@ public interface UserService {
     UserResponse getUser(String id);
 
     UserResponse updateUser(String userId, UserUpdateRequest request);
+
+    UserResponse deleteInstructor(String userId) throws MessagingException;
+
+    UserResponse registerInstructor()throws MessagingException;
+
+    UserResponse accessInstructor(String userId) throws MessagingException;
+
+    UserResponse notAccessInstructor(String userId) throws MessagingException;
 
     void updateTeacher(String userId);
 

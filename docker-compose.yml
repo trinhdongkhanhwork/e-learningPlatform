@@ -6,7 +6,11 @@ services:
     restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
+
       MYSQL_DATABASE: dreamslmsfinal
+
+      MYSQL_DATABASE: CourseForDevelopment
+
     volumes:
       - ./mysql-volume:/var/lib/mysql
       - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -26,14 +30,26 @@ services:
     environment:
       DATABASE_HOST: mysqldb
       DATABASE_PORT: 3306
+
       DATABASE_NAME: dreamslmsfinal
+
+      DATABASE_NAME: CourseForDevelopment
+
       DATABASE_USER: root
       DATABASE_PASSWORD: root
       SPRING_PROFILES_ACTIVE: dev
     depends_on:
+
       - dreamslmsfinal
+
+      - mysqldb
+
     networks:
       - springboot-mysql-net
 
 networks:
+
   springboot-mysql-net:
+
+  springboot-mysql-net:
+

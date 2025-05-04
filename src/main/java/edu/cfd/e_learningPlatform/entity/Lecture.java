@@ -37,8 +37,6 @@ public class Lecture {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    private boolean completed;
-
     @ManyToOne
     @JoinColumn(name = "section_id")
     @JsonBackReference

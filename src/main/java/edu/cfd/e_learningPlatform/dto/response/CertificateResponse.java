@@ -1,4 +1,5 @@
 package edu.cfd.e_learningPlatform.dto.response;
+import edu.cfd.e_learningPlatform.entity.Course;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CertificateResponse {
     private Long id;
-    private Long courseId;
-    private String courseTitle;
+    private CourseResponse CourseResponse;
     private LocalDateTime issuedAt;
 }
