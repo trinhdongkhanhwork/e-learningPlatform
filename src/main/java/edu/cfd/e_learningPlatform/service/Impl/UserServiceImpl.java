@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
         user.setRoles(Set.of(defaultRole));
         user.setCreatedDate(now);
-        user.setActive(false);
+        user.setActive(true);
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

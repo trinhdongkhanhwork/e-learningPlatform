@@ -34,7 +34,6 @@ public class ApplicationInitConfig {
     PermissionRepository permissionRepository;
 
     @Bean
-    @ConditionalOnProperty(prefix = "spring", name = "some.property", havingValue = "true")
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
             if (roleRepository.count() == 0) {
