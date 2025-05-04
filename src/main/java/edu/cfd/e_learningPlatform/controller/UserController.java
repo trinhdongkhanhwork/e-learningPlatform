@@ -46,17 +46,52 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping("/getListUsersUpdateTeacher")
-    ApiResponse<List<UserResponse>> getUsersUpdateTeacher() {
+    @GetMapping("/getListRegisterInstructor")
+    ApiResponse<List<UserResponse>> getListRegisterInstructor() {
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getUsersUpdateTeacher())
                 .build();
     }
 
     @GetMapping("/myInfo")
-    ApiResponse<UserResponse> getMyInfo() {
+    ApiResponse<Boolean> getMyInfo() {
+        return ApiResponse.<Boolean>builder()
+                .result(userService.isRegisterInstructor())
+                .build();
+    }
+
+    @GetMapping("/isRegisterInstructor")
+    ApiResponse<UserResponse> isRegisterInstructor() {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
+                .build();
+    }
+
+    @PutMapping("/registerInstructor")
+    ApiResponse<UserResponse> registerInstructor() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.registerInstructor())
+                .build();
+    }
+
+//    @PutMapping("/deleteInstructor/{userId}")
+//    ApiResponse<UserResponse> deleteInstructor(@PathVariable String userId) throws MessagingException {
+//        return ApiResponse.<UserResponse>builder()
+//                .result(userService.deleteInstructor(userId))
+//                .build();
+//    }
+
+//    @PutMapping("/accessInstructor/{userId}")
+//    ApiResponse<UserResponse> accessInstructor(@PathVariable String userId) throws MessagingException {
+//        return ApiResponse.<UserResponse>builder()
+//                .result(userService.accessInstructor(userId))
+//                .build();
+//    }
+
+    @PutMapping("/notAccessInstructor/{userId}")
+    ApiResponse<UserResponse> notAccessInstructor(@PathVariable String userId) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.notAccessInstructor(userId))
                 .build();
     }
 

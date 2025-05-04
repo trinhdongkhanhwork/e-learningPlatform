@@ -71,6 +71,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Boolean isRegisterInstructor() {
+        User user = getCurrentUser();
+        return user.isActive() || user.getRoles().stream()
+                .map(Role::getRoleName)
+                .anyMatch(roleName -> roleName.equals("INSTRUCTOR"));    }
+
+//    @Override
+//    public UserResponse deleteInstructor(String userId){
+//        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//        Role role = roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+//        user.setRoleEntity(role);
+//        return userMapper.toUserResponse(userRepository.save(user));
+//    }
+
+    @Override
+    public UserResponse registerInstructor(){
+        User user = getCurrentUser();
+        user.setActive(true);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+//    @Override
+//    public UserResponse accessInstructor(String userId){
+//        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//        Role role = roleRepository.findByRoleName("INSTRUCTOR").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+//        user.setRoleEntity(role);
+//        return userMapper.toUserResponse(userRepository.save(user));
+//    }
+
+    @Override
+    public UserResponse notAccessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setActive(false);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+    @Override
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -113,8 +149,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getUsersUpdateTeacher() {
         return userRepository.findAll().stream()
-                .filter(user -> !user.isActive())
-                .filter(user -> "INSTRUCTOR".equals(user.getRoles().stream().map(Role::getRoleName).
+                .filter(user -> user.isActive() || "INSTRUCTOR".equals(user.getRoles().stream().map(Role::getRoleName).
                         filter(roleName -> roleName.equals("INSTRUCTOR")).findFirst().orElse(null)))
                 .map(userMapper::toUserResponse)
                 .toList();

@@ -10,6 +10,16 @@ import java.util.List;
 public interface UserService {
     UserResponse createUser(UserCreationRequest request);
 
+    Boolean isRegisterInstructor();
+
+//    public UserResponse deleteInstructor(String userId);
+
+    public UserResponse registerInstructor();
+
+//    public UserResponse accessInstructor(String userId);
+
+    public UserResponse notAccessInstructor(String userId);
+
     UserResponse getMyInfo();
 
     List<UserResponse> getUsers();
