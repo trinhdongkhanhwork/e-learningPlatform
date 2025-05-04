@@ -32,11 +32,6 @@ public class AdminController {
         return permissionService.getAllPermissions();
     }
 
-    @GetMapping("/getAllPermissionsOfUser")
-    public List<String> getAllPermissionsOfUser(String userId) {
-        return permissionService.getAllPermissionsOfUser(userId);
-    }
-
     @PreAuthorize("hasAuthority('ADMIN_SYSTEM')")
     @PostMapping("/createPermission")
     public RolePermissionResponse createPermission(@Valid @RequestBody RolePermissionCreationRequest request) {
@@ -55,6 +50,7 @@ public class AdminController {
         permissionService.deletePermission(permissionId);
         return ResponseEntity.ok(Map.of("message", "Permission " + permissionId + " deleted successfully"));
     }
+
 
 
     @GetMapping("/getAllStaffs")
