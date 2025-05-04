@@ -2,16 +2,15 @@ package edu.cfd.e_learningPlatform.controller;
 
 import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
 import edu.cfd.e_learningPlatform.dto.response.QuizResponse;
-import edu.cfd.e_learningPlatform.dto.response.UserResponse;
-import edu.cfd.e_learningPlatform.entity.Question;
 import edu.cfd.e_learningPlatform.entity.Quiz;
-import edu.cfd.e_learningPlatform.service.Impl.QuizService;
 import edu.cfd.e_learningPlatform.service.Impl.QuizServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;

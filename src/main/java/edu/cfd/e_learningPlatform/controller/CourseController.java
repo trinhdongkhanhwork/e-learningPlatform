@@ -1,21 +1,18 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.util.List;
-import java.util.Map;
-
+import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
+import edu.cfd.e_learningPlatform.dto.response.CountStatusCourseResponse;
+import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
+import edu.cfd.e_learningPlatform.service.CourseService;
 import jakarta.validation.Valid;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import edu.cfd.e_learningPlatform.dto.CourseDto;
-import edu.cfd.e_learningPlatform.dto.request.CourseCreationRequest;
-import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.dto.response.CourseResponse;
-import edu.cfd.e_learningPlatform.service.CourseService;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -55,9 +52,9 @@ public class CourseController {
 
     // Xóa khóa học thực tế khi admin duyệt xóa
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Course " + id + " deleted successfully"));
     }
 
     @GetMapping("/getCourseById/{id}")
@@ -75,5 +72,10 @@ public class CourseController {
     @GetMapping("/count")
     public ResponseEntity<Long> getTotalCourses() {
         return ResponseEntity.ok(courseService.getTotalCourses());
+    }
+
+    @GetMapping("/countStatusCourse")
+    public ResponseEntity<CountStatusCourseResponse> countStatusCourse(){
+        return ResponseEntity.ok(courseService.countStatusCourse());
     }
 }

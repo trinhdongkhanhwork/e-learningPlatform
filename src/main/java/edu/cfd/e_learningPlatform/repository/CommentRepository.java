@@ -1,11 +1,10 @@
 package edu.cfd.e_learningPlatform.repository;
 
-import java.util.List;
-
+import edu.cfd.e_learningPlatform.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import edu.cfd.e_learningPlatform.entity.Comment;
+import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value = "select " + "c.id as id, "

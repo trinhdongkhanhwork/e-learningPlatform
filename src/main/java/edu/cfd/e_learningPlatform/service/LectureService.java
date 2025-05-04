@@ -1,9 +1,9 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.LectureDto;
 import edu.cfd.e_learningPlatform.dto.response.LectueUserResponse;
+
+import java.util.List;
 
 public interface LectureService {
     LectueUserResponse getLectureUserById(Long lectureId);

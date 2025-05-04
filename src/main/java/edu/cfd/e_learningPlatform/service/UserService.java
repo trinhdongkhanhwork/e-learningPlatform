@@ -1,14 +1,12 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.util.List;
-
-import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
-import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
-import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
-import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
+import edu.cfd.e_learningPlatform.dto.request.*;
 import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
+import edu.cfd.e_learningPlatform.dto.response.StaffResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.User;
+
+import java.util.List;
 
 public interface UserService {
     UserResponse createUser(UserCreationRequest request);
@@ -35,5 +33,9 @@ public interface UserService {
 
     ProfileUpdateResponse updateProfile(String userId, ProfileUpdateRequest request);
 
-    long getUserCountByRoleId();
+//    long getUserCountByRoleId();
+
+    UserResponse createAccountStaff(StaffCreationRequest request);
+
+    List<StaffResponse> getStaffs();
 }

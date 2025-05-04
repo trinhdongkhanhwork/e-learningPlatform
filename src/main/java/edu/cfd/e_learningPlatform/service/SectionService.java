@@ -1,8 +1,8 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.SectionDto;
+
+import java.util.List;
 
 public interface SectionService {
     SectionDto createSection(SectionDto sectionDto);

@@ -3,7 +3,6 @@ package edu.cfd.e_learningPlatform.service.Impl;
 import edu.cfd.e_learningPlatform.config.AuditorAwareImpl;
 import edu.cfd.e_learningPlatform.dto.request.ActivityLogRequest;
 import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.entity.Course;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.repository.CourseRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;

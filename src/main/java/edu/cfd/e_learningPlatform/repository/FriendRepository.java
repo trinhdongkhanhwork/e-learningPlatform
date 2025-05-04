@@ -23,13 +23,13 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             "and f.status = 1")
     List<User> selectFriends(@Param("idUser") String idUser);
 
-    @Query("SELECT new edu.cfd.e_learningPlatform.dto.response.FriendUserResponse(new edu.cfd.e_learningPlatform.dto.response.FriendResponse(f.id, f.user.id, f.friend.id, f.createdAt, f.status), new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.active, u.roleEntity)) " +
+    @Query("SELECT new edu.cfd.e_learningPlatform.dto.response.FriendUserResponse(new edu.cfd.e_learningPlatform.dto.response.FriendResponse(f.id, f.user.id, f.friend.id, f.createdAt, f.status), new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.isActive, u.roles)) " +
             "FROM User u LEFT JOIN Friend f ON (f.user = u OR f.friend = u) " +
             "                                  AND (f.user.id = :idUser OR f.friend.id = :idUser) " +
             "WHERE LOWER(u.fullname) LIKE LOWER(CONCAT('%', TRIM(:keyword), '%')) AND u.id NOT LIKE :idUser AND :keyword NOT LIKE ''")
     List<FriendUserResponse> findByFullnameContaining(String keyword, String idUser);
 
-    @Query("select new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.active, u.roleEntity) " +
+    @Query("select new edu.cfd.e_learningPlatform.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.birthday, u.gender, u.phone, u.avatarUrl, u.updatedDate, u.createdDate, u.version, u.isActive, u.roles) " +
             "from User u left join Friend f on u = f.user " +
             "where f.status = 0 and f.friend.id = :idUser")
     List<UserResponse> selectInvitation(String idUser);

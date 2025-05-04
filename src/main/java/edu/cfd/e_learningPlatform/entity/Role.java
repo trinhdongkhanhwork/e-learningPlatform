@@ -1,11 +1,11 @@
 package edu.cfd.e_learningPlatform.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Builder
@@ -33,4 +33,8 @@ public class Role {
     @Version
     @Column(name = "version")
     private Integer version;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "role_permissions")
+    private Set<Permission> permissions;
 }

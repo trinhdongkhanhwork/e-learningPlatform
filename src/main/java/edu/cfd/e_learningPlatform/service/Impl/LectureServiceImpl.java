@@ -1,18 +1,17 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import edu.cfd.e_learningPlatform.dto.response.LectueUserResponse;
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.LectureDto;
+import edu.cfd.e_learningPlatform.dto.response.LectueUserResponse;
 import edu.cfd.e_learningPlatform.entity.Lecture;
 import edu.cfd.e_learningPlatform.mapstruct.LectureMapper;
 import edu.cfd.e_learningPlatform.repository.LectureRepository;
 import edu.cfd.e_learningPlatform.service.AssignmentService;
 import edu.cfd.e_learningPlatform.service.LectureService;
 import edu.cfd.e_learningPlatform.service.VideoService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LectureServiceImpl implements LectureService {

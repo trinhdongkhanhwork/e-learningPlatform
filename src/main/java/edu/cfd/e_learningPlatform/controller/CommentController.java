@@ -1,17 +1,16 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import edu.cfd.e_learningPlatform.entity.Comment;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
 import edu.cfd.e_learningPlatform.dto.request.CommentRequest;
 import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
+import edu.cfd.e_learningPlatform.entity.Comment;
 import edu.cfd.e_learningPlatform.service.CommentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 

@@ -3,7 +3,10 @@ package edu.cfd.e_learningPlatform.controller;
 import edu.cfd.e_learningPlatform.entity.Question;
 import edu.cfd.e_learningPlatform.service.Impl.QuestionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

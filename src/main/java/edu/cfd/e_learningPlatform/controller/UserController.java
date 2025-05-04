@@ -1,18 +1,11 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import java.util.List;
-
 import edu.cfd.e_learningPlatform.dto.request.ProfileUpdateRequest;
-import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
 import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
+import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.UpdatePassWordResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.service.UserService;
@@ -20,6 +13,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -109,9 +107,9 @@ public class UserController {
                 .result(updatedProfile)
                 .build();
     }
-
-    @GetMapping("/count/instructor")
-    public ResponseEntity<Long> getUserCountByRole1() {
-        return ResponseEntity.ok(userService.getUserCountByRoleId());
-    }
+//
+//    @GetMapping("/count/instructor")
+//    public ResponseEntity<Long> getUserCountByRole1() {
+//        return ResponseEntity.ok(userService.getUserCountByRoleId());
+//    }
 }

@@ -2,7 +2,6 @@ package edu.cfd.e_learningPlatform.controller;
 
 
 import edu.cfd.e_learningPlatform.dto.request.SendInvatitionRequest;
-import edu.cfd.e_learningPlatform.dto.response.FriendResponse;
 import edu.cfd.e_learningPlatform.dto.response.FriendUserResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.enums.FriendStatus;
@@ -43,7 +42,7 @@ public class FriendController {
     public ResponseEntity<List<UserResponse>> getInvitation(@PathVariable String idUser){
         return ResponseEntity.ok(friendService.getInvitations(idUser));
     }
-    
+
     @DeleteMapping
     public ResponseEntity<String> deleteFriend(@RequestBody SendInvatitionRequest sendInvatitionRequest){
         return ResponseEntity.ok(friendService.deleteFriend(sendInvatitionRequest.getIdUser(), sendInvatitionRequest.getIdFriend()));

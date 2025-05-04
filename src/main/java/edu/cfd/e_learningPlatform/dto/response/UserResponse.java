@@ -1,12 +1,13 @@
 package edu.cfd.e_learningPlatform.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import edu.cfd.e_learningPlatform.entity.Role;
 import edu.cfd.e_learningPlatform.enums.Gender;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -26,5 +27,5 @@ public class UserResponse {
     LocalDateTime createdDate;
     int version;
     boolean active;
-    Role roleEntity;
+    Set<Role> roles;
 }

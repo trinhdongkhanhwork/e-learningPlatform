@@ -1,15 +1,13 @@
 package edu.cfd.e_learningPlatform.service;
 
-import java.text.ParseException;
-
-import org.springframework.stereotype.Service;
-
 import com.nimbusds.jose.JOSEException;
-
 import edu.cfd.e_learningPlatform.dto.request.AuthenticationRequest;
 import edu.cfd.e_learningPlatform.dto.request.IntrospectRequest;
 import edu.cfd.e_learningPlatform.dto.response.AuthenticationResponse;
 import edu.cfd.e_learningPlatform.dto.response.IntrospectResponse;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
 
 @Service
 public interface AuthenticationService {

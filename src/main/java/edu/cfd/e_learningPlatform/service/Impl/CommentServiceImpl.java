@@ -1,18 +1,12 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import edu.cfd.e_learningPlatform.mapstruct.UserMapper;
-import org.springframework.stereotype.Service;
-
 import edu.cfd.e_learningPlatform.dto.request.CommentRequest;
 import edu.cfd.e_learningPlatform.dto.response.CommentVideoResponse;
 import edu.cfd.e_learningPlatform.entity.Comment;
 import edu.cfd.e_learningPlatform.entity.User;
 import edu.cfd.e_learningPlatform.entity.Video;
 import edu.cfd.e_learningPlatform.mapstruct.CommentMapper;
+import edu.cfd.e_learningPlatform.mapstruct.UserMapper;
 import edu.cfd.e_learningPlatform.repository.CommentRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.repository.VideoRepository;
@@ -20,6 +14,11 @@ import edu.cfd.e_learningPlatform.service.CommentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

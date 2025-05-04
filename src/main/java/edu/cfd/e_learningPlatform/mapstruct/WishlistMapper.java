@@ -1,12 +1,11 @@
 package edu.cfd.e_learningPlatform.mapstruct;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-
 import edu.cfd.e_learningPlatform.dto.request.WishlistRequest;
 import edu.cfd.e_learningPlatform.dto.response.WishlistDtoResponse;
 import edu.cfd.e_learningPlatform.entity.Wishlist;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface WishlistMapper {

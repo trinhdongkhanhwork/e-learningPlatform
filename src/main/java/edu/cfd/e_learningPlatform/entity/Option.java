@@ -1,7 +1,6 @@
 package edu.cfd.e_learningPlatform.entity;
 
 import jakarta.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,6 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
 
-import edu.cfd.e_learningPlatform.dto.response.FriendResponse;
 import edu.cfd.e_learningPlatform.dto.response.FriendUserResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.entity.Friend;

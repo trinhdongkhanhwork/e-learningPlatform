@@ -1,22 +1,19 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
+import edu.cfd.e_learningPlatform.entity.Video;
+import edu.cfd.e_learningPlatform.repository.VideoRepository;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
-
-import edu.cfd.e_learningPlatform.entity.Video;
-import edu.cfd.e_learningPlatform.repository.VideoRepository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class S3ServiceImpl implements edu.cfd.e_learningPlatform.service.S3Service {

@@ -1,6 +1,5 @@
 package edu.cfd.e_learningPlatform.controller;
 
-import edu.cfd.e_learningPlatform.dto.request.ProgressListCheckRequest;
 import edu.cfd.e_learningPlatform.dto.request.ProgressUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.FirstIncompleteLectureResponse;
 import edu.cfd.e_learningPlatform.service.Impl.LearningProgressService;

@@ -13,7 +13,6 @@ import edu.cfd.e_learningPlatform.repository.PaymentRepository;
 import edu.cfd.e_learningPlatform.repository.RatingRepository;
 import edu.cfd.e_learningPlatform.repository.UserRepository;
 import edu.cfd.e_learningPlatform.service.RatingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,23 +1,10 @@
 package edu.cfd.e_learningPlatform.service.Impl;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
 import edu.cfd.e_learningPlatform.dto.request.AuthenticationRequest;
 import edu.cfd.e_learningPlatform.dto.request.ExchangeTokenRequest;
 import edu.cfd.e_learningPlatform.dto.request.IntrospectRequest;
@@ -38,6 +25,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.Set;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -114,8 +113,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .email(userInfo.getEmail())
                         .fullname(userInfo.getName())
                         .avatarUrl(userInfo.getPicture())
-                        .active(false)
-                        .roleEntity(defaultRole)
+                        .isActive(false)
+                        .roles(Set.of(defaultRole))
                         .build()));
         var token = generateToken(user);
         return AuthenticationResponse.builder().token(token).build();
@@ -134,7 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var token = generateToken(user);
 
-        return AuthenticationResponse.builder().token(token).authenticated(true).build();
+        return AuthenticationResponse.builder().token(token).build();
     }
 
     private String generateToken(User user) {
@@ -164,8 +163,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
-        if (user.getRoleEntity() != null) {
-            stringJoiner.add(user.getRoleEntity().getRoleName());
+        if (user.getRoles() != null) {
+            stringJoiner.add(user.getRoles().stream()
+                    .map(Role::getRoleName)
+                    .reduce((a, b) -> a + " " + b)
+                    .orElse(""));
         }
 
         return stringJoiner.toString();
