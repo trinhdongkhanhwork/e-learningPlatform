@@ -12,11 +12,11 @@ public interface UserService {
 
     Boolean isRegisterInstructor();
 
-//    public UserResponse deleteInstructor(String userId);
+    public UserResponse deleteInstructor(String userId);
 
     public UserResponse registerInstructor();
 
-//    public UserResponse accessInstructor(String userId);
+    public UserResponse accessInstructor(String userId);
 
     public UserResponse notAccessInstructor(String userId);
 

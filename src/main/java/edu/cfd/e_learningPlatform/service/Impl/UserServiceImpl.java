@@ -77,13 +77,13 @@ public class UserServiceImpl implements UserService {
                 .map(Role::getRoleName)
                 .anyMatch(roleName -> roleName.equals("INSTRUCTOR"));    }
 
-//    @Override
-//    public UserResponse deleteInstructor(String userId){
-//        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//        Role role = roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-//        user.setRoleEntity(role);
-//        return userMapper.toUserResponse(userRepository.save(user));
-//    }
+    @Override
+    public UserResponse deleteInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("STUDENT").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoles(Set.of(role)
+        );        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
     @Override
     public UserResponse registerInstructor(){
@@ -92,13 +92,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-//    @Override
-//    public UserResponse accessInstructor(String userId){
-//        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//        Role role = roleRepository.findByRoleName("INSTRUCTOR").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-//        user.setRoleEntity(role);
-//        return userMapper.toUserResponse(userRepository.save(user));
-//    }
+    @Override
+    public UserResponse accessInstructor(String userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role role = roleRepository.findByRoleName("INSTRUCTOR").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        user.setRoles(Set.of(role)
+        );
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
     @Override
     public UserResponse notAccessInstructor(String userId){
