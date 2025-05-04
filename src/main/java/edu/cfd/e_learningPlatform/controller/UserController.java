@@ -5,7 +5,6 @@ import edu.cfd.e_learningPlatform.dto.request.UpdatePassWordRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserCreationRequest;
 import edu.cfd.e_learningPlatform.dto.request.UserUpdateRequest;
 import edu.cfd.e_learningPlatform.dto.response.ApiResponse;
-import edu.cfd.e_learningPlatform.dto.response.ProfileUpdateResponse;
 import edu.cfd.e_learningPlatform.dto.response.UpdatePassWordResponse;
 import edu.cfd.e_learningPlatform.dto.response.UserResponse;
 import edu.cfd.e_learningPlatform.service.UserService;
@@ -99,11 +98,11 @@ public class UserController {
                 .build();
     }
     @PutMapping("/profile/{userId}")
-    public ApiResponse<ProfileUpdateResponse> updateProfile(
+    public ApiResponse<UserResponse> updateProfile(
             @PathVariable String userId,
             @ModelAttribute ProfileUpdateRequest request) {
-        ProfileUpdateResponse updatedProfile = userService.updateProfile(userId, request);
-        return ApiResponse.<ProfileUpdateResponse>builder()
+        UserResponse updatedProfile = userService.updateProfile(userId, request);
+        return ApiResponse.<UserResponse>builder()
                 .result(updatedProfile)
                 .build();
     }
